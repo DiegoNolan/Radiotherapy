@@ -113,6 +113,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="beamLetmapping.cpp" />
     <ClCompile Include="datareduction.cpp" />
     <ClCompile Include="graph.cpp" />
     <ClCompile Include="graphicorgan.cpp" />
@@ -125,6 +126,7 @@
     <ClCompile Include="voxelmapping.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="beamLetmapping.h" />
     <ClInclude Include="graph.h" />
     <ClInclude Include="graphicorgan.h" />
     <ClInclude Include="graphicvoxel.h" />

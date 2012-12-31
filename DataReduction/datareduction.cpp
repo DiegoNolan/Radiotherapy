@@ -30,6 +30,7 @@ using std::endl;
 int main()
 {
    vector<string> fnames;
+   string vox_name = "run1";
    // enter file names
 	fnames.push_back("Spinalcord+0.5");
 	fnames.push_back("L PAROTID");
@@ -42,22 +43,36 @@ int main()
    VoxelMapping voxmap;
 
    // parse data and write data to files
-   parseOrganData(vox, organSets, voxmap, fnames);
+   if( !allFiles(vox_name, fnames) ){
+      parseOrganData(vox, organSets, voxmap, fnames, vox_name);
+   }else{
+      // read the already parsed files
+      vox.read("../data/" + vox_name + ".vox");
+      for(unsigned i=0;i<fnames.size();++i)
+      {
+         readSet(organSets[i], "../data/" + fnames[i] + ".set");
+      }
+      // get the voxelmapping
+      voxmap.read("../data/" + vox_name + ".voxmap");
+   }
 
 	cout << "done " << endl;
 
-   sf::Window window(sf::VideoMode(900, 600), "test");
+   // display graphical representation of the voxels
+   sf::Window window(sf::VideoMode(1200, 900), "test");
 
    initGL(window);
 
    vector<GraphicOrgan> graphicOrgans(organSets.size());
 
+   // create the graphical organs
    for(unsigned i=0;i<graphicOrgans.size();++i)
    {
       graphicOrgans[i] = GraphicOrgan(organSets[i],voxmap,
          organ_colors[i][0], organ_colors[i][1], organ_colors[i][2]);
    }
 
+   // display loop
    while(1)
    {
       handleEvents(window);

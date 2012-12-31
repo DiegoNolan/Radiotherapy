@@ -1,7 +1,7 @@
 #include "parsedata.h"
 
 void parseOrganData(Sparse_Matrix<IloInt> & vox, vector<std::set<unsigned> > & organSets,
-   VoxelMapping & voxelmap, vector<string> fnames)
+   VoxelMapping & voxelmap, vector<string> fnames, string vox_name)
 {
    vector<Sparse_Matrix<IloInt> > voxs(fnames.size());
    string prefix = "../data/";
@@ -155,8 +155,10 @@ void parseOrganData(Sparse_Matrix<IloInt> & vox, vector<std::set<unsigned> > & o
 	cout << "There are " << totalOrganVoxels << " voxels in organs, assuming no intersections "
 		" and that makes up " << (double(totalOrganVoxels)/double(voxs[0].m))*100. << "%" << endl;
 
-	voxs[0].write(prefix + "run1.vox");
+	voxs[0].write(prefix +  vox_name + ".vox");
 
+   // write the voxelmapping
+   voxelmap.write(prefix + vox_name + ".voxmap");
 }
 
 bool isNum(char & ch)
@@ -273,7 +275,7 @@ Sparse_Matrix<IloInt> getVoxMatrix(char * buffer, unsigned long bufferSize,
 {
 	bool inData = false;
 	short dose, beam_ind;
-	beam_ind = -1;
+	beam_ind = -1; // start at negative one because the first beam is zero
 	SparseMatrix vox;
 	vox.a.resize(vox.a.size()+RESIZE_AMOUNT);
 	vox.i.resize(vox.i.size()+RESIZE_AMOUNT);
@@ -566,6 +568,40 @@ bool isEqual(float one, float two, float tol)
 {
    if(two < one-tol || two > one+tol){
       return false;
+   }
+
+   return true;
+}
+
+bool fileExists(const std::string& filename)
+{
+   fstream file;
+   file.open(filename.c_str(), ios_base::out | ios_base::in); // does not create file
+   if( file.is_open())
+   {
+      file.close();
+      return true;
+   }
+
+   cout << filename << " does not exist " << endl;
+   return false;
+}
+
+bool allFiles(string vox_name, vector<string> organ_names)
+{
+   if( !fileExists("../data/" + vox_name + ".vox")){
+      return false;
+   }
+
+   if( !fileExists("../data/" + vox_name + ".voxmap")){
+      return false;
+   }
+
+   for(unsigned i=0;i<organ_names.size();++i)
+   {
+      if( !fileExists("../data/" + organ_names[i] + ".set") ){
+         return false;
+      }
    }
 
    return true;

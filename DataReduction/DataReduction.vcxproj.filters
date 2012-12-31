@@ -45,6 +45,9 @@
     <ClCompile Include="voxelmapping.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="beamLetmapping.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="graph.h">
@@ -75,6 +78,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="voxelmapping.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="beamLetmapping.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

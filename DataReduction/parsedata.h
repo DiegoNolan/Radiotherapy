@@ -13,6 +13,7 @@ ILOSTLBEGIN
 #include "sparsematrix.h"	// format 1
 #include "sparse_matrix.h"  // Yale format
 #include "voxelmapping.h"
+#include "beamLetmapping.h"
 
 // shortest line is atleast longer than this amount of chars
 #define MIN_LINE 10
@@ -23,17 +24,12 @@ ILOSTLBEGIN
 // how many lines the x, y, z data is
 #define XYZ_LENGTH 21
 
-// struct for beamlet vector
-typedef struct
-{
-	short rx;
-	short ry;
-} vec2;
+
 
 // fills the matrix with the dose data and the sets with the organ data
 // and prints a bunch of stats about the data
 void parseOrganData(Sparse_Matrix<IloInt> & vox, vector<std::set<unsigned> > & organSets,
-   VoxelMapping & voxelmap, vector<string> fnames);
+   VoxelMapping & voxelmap, vector<string> fnames, string vox_name);
 
 // returns true if the charactor is a number
 bool isNum(char & ch);
@@ -62,3 +58,9 @@ VoxelMapping getVoxelMapping(char * buffer, unsigned bufferSize);
 
 // checks for equality of floats inside a certain tolerance
 bool isEqual(float one, float two, float tol);
+
+// returns true if was able to open file
+bool fileExists(const std::string& filename);
+
+// do files exist
+bool allFiles(string vox_name, vector<string> organ_names);

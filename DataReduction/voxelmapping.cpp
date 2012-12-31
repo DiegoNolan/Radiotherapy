@@ -60,3 +60,41 @@ void VoxelMapping::operator= (VoxelMapping arg)
    yc = arg.yc;
    zc = arg.zc;
 }
+
+void VoxelMapping::write(string fname)
+{
+   std::ofstream out;
+   out.open(fname.c_str());
+
+   if( out )
+   {
+      out << xs << " " << ys << " " << zs << endl;
+      out << xi << " " << yi << " " << zi << endl;
+      out << xc << " " << yc << " " << zc;
+   }
+   else
+   {
+      cout << "Error opening " << fname << endl;
+   }
+
+   out.close();
+}
+
+void VoxelMapping::read(string fname)
+{
+   std::ifstream in;
+   in.open(fname.c_str());
+
+   if( in )
+   {
+      in >> xs >> ys >> zs;
+      in >> xi >> yi >> zi;
+      in >> xc >> yc >> zc;
+   }
+   else
+   {
+      cout << "Error opening " << fname << endl;
+   }
+
+   in.close();
+}

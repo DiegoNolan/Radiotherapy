@@ -4,9 +4,13 @@
 // in x,y,z coordinates
 
 #include <iostream>
+#include <fstream>
+#include <sstream>
+#include <string>
 
 using std::cout;
 using std::endl;
+using std::string;
 
 class VoxelMapping
 {
@@ -23,6 +27,8 @@ public:
    float width(){return xs;}
    float height(){return ys;}
    float depth(){return zs;}
+   void write(string fname);
+   void read(string fname);
 private:
    float xs, ys, zs, xi, yi, zi;
    unsigned xc, yc, zc;

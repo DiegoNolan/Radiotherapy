@@ -1,0 +1,7 @@
+data/
+ipch/
+*.opensdf
+*.suo
+x64/
+Debug/
+*.sdf

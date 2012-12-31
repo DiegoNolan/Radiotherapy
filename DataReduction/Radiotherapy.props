@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ImportGroup Label="PropertySheets" />
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup />
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <AdditionalIncludeDirectories>C:\boost_1_51_0;C:\Program Files\IBM\ILOG\CPLEX_Studio124\concert\include;C:\Program Files\IBM\ILOG\CPLEX_Studio124\cplex\include;C:\SFML\include;../include</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_CONSOLE;IL_STD;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+    </ClCompile>
+    <Link>
+      <AdditionalLibraryDirectories>C:\boost_1_51_0\stage\lib;C:\SFML\lib\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>$(CPLEX_STUDIO_DIR124)\cplex\lib\x64_windows_vs2010\stat_mtd\cplex124.lib;$(CPLEX_STUDIO_DIR124)\cplex\lib\x64_windows_vs2010\stat_mtd\ilocplex.lib;$(CPLEX_STUDIO_DIR124)\concert\lib\x64_windows_vs2010\stat_mtd\concert.lib;sfml-graphics-d.lib;sfml-system-d.lib;sfml-window-d.lib;opengl32.lib;glu32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup />
+</Project>

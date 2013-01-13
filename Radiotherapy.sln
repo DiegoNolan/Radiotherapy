@@ -3,6 +3,8 @@ Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DataReduction", "DataReduction\DataReduction.vcxproj", "{F3890724-34C3-49DF-8B6E-28B3CF31E340}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "VisualExample", "VisualExample\VisualExample.vcxproj", "{AC818041-FC6D-4D78-808D-AB114E2E55C2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -13,6 +15,10 @@ Global
 		{F3890724-34C3-49DF-8B6E-28B3CF31E340}.Debug|Win32.Build.0 = Debug|x64
 		{F3890724-34C3-49DF-8B6E-28B3CF31E340}.Release|Win32.ActiveCfg = Release|Win32
 		{F3890724-34C3-49DF-8B6E-28B3CF31E340}.Release|Win32.Build.0 = Release|Win32
+		{AC818041-FC6D-4D78-808D-AB114E2E55C2}.Debug|Win32.ActiveCfg = Debug|x64
+		{AC818041-FC6D-4D78-808D-AB114E2E55C2}.Debug|Win32.Build.0 = Debug|x64
+		{AC818041-FC6D-4D78-808D-AB114E2E55C2}.Release|Win32.ActiveCfg = Release|Win32
+		{AC818041-FC6D-4D78-808D-AB114E2E55C2}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

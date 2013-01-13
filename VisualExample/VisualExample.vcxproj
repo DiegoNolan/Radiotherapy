@@ -18,33 +18,9 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\include\beamLetmapping.h" />
-    <ClInclude Include="..\include\graph.h" />
-    <ClInclude Include="..\include\graphicorgan.h" />
-    <ClInclude Include="..\include\graphicvoxel.h" />
-    <ClInclude Include="..\include\parsedata.h" />
-    <ClInclude Include="..\include\set.h" />
-    <ClInclude Include="..\include\sparsematrix.h" />
-    <ClInclude Include="..\include\sparse_matrix.h" />
-    <ClInclude Include="..\include\visualizer.h" />
-    <ClInclude Include="..\include\voxelmapping.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="..\src\beamletmapping.cpp" />
-    <ClCompile Include="..\src\graph.cpp" />
-    <ClCompile Include="..\src\graphicorgan.cpp" />
-    <ClCompile Include="..\src\graphicvoxel.cpp" />
-    <ClCompile Include="..\src\parsedata.cpp" />
-    <ClCompile Include="..\src\set.cpp" />
-    <ClCompile Include="..\src\sparsematrix.cpp" />
-    <ClCompile Include="..\src\visualizer.cpp" />
-    <ClCompile Include="..\src\voxelmapping.cpp" />
-    <ClCompile Include="datareduction.cpp" />
-  </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{F3890724-34C3-49DF-8B6E-28B3CF31E340}</ProjectGuid>
-    <RootNamespace>DataReduction</RootNamespace>
+    <ProjectGuid>{AC818041-FC6D-4D78-808D-AB114E2E55C2}</ProjectGuid>
+    <RootNamespace>VisualExample</RootNamespace>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -74,19 +50,19 @@
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="Radiotherapy.props" />
+    <Import Project="..\DataReduction\Radiotherapy.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="Radiotherapy.props" />
+    <Import Project="..\DataReduction\Radiotherapy.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="Radiotherapy.props" />
+    <Import Project="..\DataReduction\Radiotherapy.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="Radiotherapy.props" />
+    <Import Project="..\DataReduction\Radiotherapy.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup />
@@ -97,7 +73,6 @@
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -107,7 +82,6 @@
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -136,6 +110,28 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
   </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\src\disthelper.cpp" />
+    <ClCompile Include="..\src\distribution.cpp" />
+    <ClCompile Include="..\src\graph.cpp" />
+    <ClCompile Include="..\src\graphics.cpp" />
+    <ClCompile Include="..\src\ilomatrix.cpp" />
+    <ClCompile Include="..\src\myilonumarray.cpp" />
+    <ClCompile Include="..\src\optimize.cpp" />
+    <ClCompile Include="..\src\set.cpp" />
+    <ClCompile Include="visualexample.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\include\disthelper.h" />
+    <ClInclude Include="..\include\distribution.h" />
+    <ClInclude Include="..\include\graph.h" />
+    <ClInclude Include="..\include\graphics.h" />
+    <ClInclude Include="..\include\ilomatrix.h" />
+    <ClInclude Include="..\include\myilonumarray.h" />
+    <ClInclude Include="..\include\optimize.h" />
+    <ClInclude Include="..\include\set.h" />
+    <ClInclude Include="..\include\sparse_matrix.h" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

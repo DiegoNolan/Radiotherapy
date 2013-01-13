@@ -8,6 +8,7 @@
       <AdditionalIncludeDirectories>C:\boost_1_51_0;C:\Program Files\IBM\ILOG\CPLEX_Studio124\concert\include;C:\Program Files\IBM\ILOG\CPLEX_Studio124\cplex\include;C:\SFML\include;../include</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_CONSOLE;IL_STD;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <WarningLevel>TurnOffAllWarnings</WarningLevel>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>C:\boost_1_51_0\stage\lib;C:\SFML\lib\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>

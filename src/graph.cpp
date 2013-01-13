@@ -6,6 +6,8 @@ Graph::Graph(string graphname, int window_width, int window_height,
    double left, double right, double bottom, double top) :
 sf::RenderWindow(sf::VideoMode(window_width, window_height), graphname)
 {
+   this->setActive(true);   
+
    red = 255;
    blue = 0;
    green = 0;
@@ -43,6 +45,8 @@ sf::RenderWindow(sf::VideoMode(window_width, window_height), graphname)
    //glEnable(GL_LIGHTING);
    glEnable(GL_TEXTURE_2D);
    glEnable(GL_CULL_FACE);
+
+   this->setActive(false);
 }
 
 Graph::~Graph()
@@ -52,6 +56,8 @@ Graph::~Graph()
 
 void Graph::update()
 {
+   this->setActive(true);
+
    // handle events
    sf::Event event;
 
@@ -108,6 +114,8 @@ void Graph::update()
    }
 
    this->display();
+
+   this->setActive(false);
 }
 
 void Graph::save(string fname)

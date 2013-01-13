@@ -109,7 +109,7 @@ void Distribution::print(string fname, IloNum lower, IloNum upper, IloInt count)
 
 	IloNum spacing = (upper - lower)/(IloNum(count)-1);
 
-	out << "Integral from -\infty to t\n";
+	out << "Integral from -infinity to t\n";
 	for(IloNum t = lower;lower<=upper;lower+=spacing)
 	{
 		out << t << '\t' << intTo(t) << '\n';

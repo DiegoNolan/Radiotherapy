@@ -22,8 +22,7 @@ void parseOrganData(Sparse_Matrix<IloInt> & vox, vector<std::set<unsigned> > & o
 			return;
 		}
 
-		unsigned long fileSize;
-		size_t result;
+		unsigned long fileSize, result;
 
 		fseek(infile, 0, SEEK_END);
 		fileSize = ftell(infile);
@@ -33,7 +32,7 @@ void parseOrganData(Sparse_Matrix<IloInt> & vox, vector<std::set<unsigned> > & o
 		buffer = (char*) malloc( sizeof(char)*fileSize);
 
 		// copy file to buffer
-		result = fread(buffer, 1, fileSize, infile);
+		result = (unsigned long)(fread(buffer, 1, fileSize, infile));
 		if( result != fileSize){
 			printf("Reading file error\n");
 		}
@@ -112,7 +111,7 @@ void parseOrganData(Sparse_Matrix<IloInt> & vox, vector<std::set<unsigned> > & o
 		}
 	}
 
-	vector<std::set<unsigned int> > setIntersections(choose(organSets.size(), 2));
+	vector<std::set<unsigned int> > setIntersections(choose(unsigned(organSets.size()), 2));
 	// get the intersection between all sets
 	unsigned int count = 0;
 	for(unsigned int i=0;i<organSets.size();++i)
@@ -149,7 +148,7 @@ void parseOrganData(Sparse_Matrix<IloInt> & vox, vector<std::set<unsigned> > & o
 	unsigned int totalOrganVoxels = 0;
 	for(unsigned int i=0;i<organSets.size();++i)
 	{
-		totalOrganVoxels += organSets[i].size();
+		totalOrganVoxels += unsigned(organSets[i].size());
 	}
 
 	cout << "There are " << totalOrganVoxels << " voxels in organs, assuming no intersections "

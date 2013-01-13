@@ -69,7 +69,7 @@ void SparseMatrix::read(string fname)
 void SparseMatrix::sort()
 {
 	// sort the vox array
-	inPlaceSorti(*this, 0, i.size()-1);
+	inPlaceSorti(*this, 0, long(i.size()-1));
 
 	// now we have to sort in j
 	unsigned int ii, jj;
@@ -114,7 +114,7 @@ unsigned int partitioni(SparseMatrix& mat, long left, long right, long pivotInde
 	flip(mat, pivotIndex, right);
 	unsigned int storeInd = left;
 
-	for(unsigned int i=left;i<right;++i)
+	for(long i=left;i<right;++i)
 	{
 		if(mat.i[i] < pivotValue)
 		{
@@ -133,7 +133,7 @@ unsigned int partitionj(SparseMatrix& mat, long left, long right, long pivotInde
 	flip(mat, pivotIndex, right);
 	unsigned int storeInd = left;
 
-	for(unsigned int i=left;i<right;++i)
+	for(long i=left;i<right;++i)
 	{
 		if(mat.j[i] < pivotValue)
 		{

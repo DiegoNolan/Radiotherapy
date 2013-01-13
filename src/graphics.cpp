@@ -247,9 +247,9 @@ void setPTVandOAR(vector<vector<Voxel> >& voxels, Set & X, Set & Y)
 		for(unsigned int j=0;j<voxels[0].size();++j)
 		{
 			if(voxels[i][j].type == PTV){
-				Y.push_back(i*voxels[i].size()+j);
+				Y.push_back(i*unsigned(voxels[i].size())+j);
 			}else if(voxels[i][j].type == OAR){
-				X.push_back(i*voxels[i].size()+j);
+				X.push_back(i*unsigned(voxels[i].size())+j);
 			}
 		}
 	}
@@ -261,7 +261,7 @@ void setDosesFromSolution(IloNumArray& vals, vector<BeamLet>& top, vector<BeamLe
 	{
 		top[i].setStrength(unsigned int(vals[i]));
 	}
-	for(unsigned int i=top.size();i<(top.size()+right.size());++i)
+	for(unsigned int i=unsigned(top.size());i<unsigned(top.size()+right.size());++i)
 	{
 		right[i-top.size()].setStrength(unsigned int(vals[i]));
 	}

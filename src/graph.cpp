@@ -29,12 +29,11 @@ sf::RenderWindow(sf::VideoMode(window_width, window_height), graphname)
    xAxis.resize(6);
    yAxis.resize(6);
 
-   xAxis[0] = convertX(ll - 1.); xAxis[1] = convertY(0.); xAxis[2] = AXIS_DEPTH;
-   xAxis[3] = convertX(rr + 1.); xAxis[4] = convertY(0.); xAxis[5] = AXIS_DEPTH;
+   xAxis[0] = float(convertX(ll - 1.)); xAxis[1] = float(convertY(0.)); xAxis[2] = AXIS_DEPTH;
+   xAxis[3] = float(convertX(rr + 1.)); xAxis[4] = float(convertY(0.)); xAxis[5] = AXIS_DEPTH;
 
-   yAxis[0] = convertX(0.f); yAxis[1] = convertY(bb-1.); yAxis[2] = AXIS_DEPTH;
-   yAxis[3] = convertX(0.f); yAxis[4] = convertY(tt+1.); yAxis[5] = AXIS_DEPTH;
-
+   yAxis[0] = float(convertX(0.f)); yAxis[1] = float(convertY(bb-1.)); yAxis[2] = AXIS_DEPTH;
+   yAxis[3] = float(convertX(0.f)); yAxis[4] = float(convertY(tt+1.)); yAxis[5] = AXIS_DEPTH;
 
    // init GL
    glShadeModel(GL_SMOOTH);
@@ -79,8 +78,8 @@ void Graph::update()
 
    glPushMatrix();
 
-   glDrawArrays(GL_LINES, 0, xAxis.size()/3);
-
+   glDrawArrays(GL_LINES, 0, GLsizei(xAxis.size()/3));
+   
    glPopMatrix();
 
    glDisableClientState(GL_VERTEX_ARRAY);
@@ -90,7 +89,7 @@ void Graph::update()
 
    glPushMatrix();
 
-   glDrawArrays(GL_LINES, 0, yAxis.size()/3);
+   glDrawArrays(GL_LINES, 0, GLsizei(yAxis.size()/3));
 
    glPopMatrix();
 
@@ -106,7 +105,7 @@ void Graph::update()
 
       glPushMatrix();
 
-      glDrawArrays(GL_LINE_STRIP, 0, verts[i].size()/3); 
+      glDrawArrays(GL_LINE_STRIP, 0, GLsizei(verts[i].size()/3)); 
 
       glPopMatrix();
 
@@ -148,12 +147,12 @@ unsigned int Graph::addplot(double (*func)(double) )
 
 	for(unsigned int i=0;i<points;++i)
 	{
-      verts[verts.size()-1][i*3] = convertX(double(i)*gap+ll);
-      verts[verts.size()-1][i*3+1] = convertY(func(double(i)*gap+ll));
+      verts[verts.size()-1][i*3] = float(convertX(double(i)*gap+ll));
+      verts[verts.size()-1][i*3+1] = float(convertY(func(double(i)*gap+ll)));
       verts[verts.size()-1][i*3+2] = 0.f;
    }
 
-   return verts.size()-1;
+   return unsigned(verts.size()-1);
 }
 
 double Graph::convertX(double x)

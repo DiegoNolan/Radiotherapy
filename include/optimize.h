@@ -3,30 +3,16 @@
 
 #include <ilcplex/ilocplex.h>
 ILOSTLBEGIN
-#include "ilomatrix.h"
 #include "sparse_matrix.h"
 #include "distribution.h"
 #include "set.h"
+#include "opt.h"
 
 #define NUM_T_VALS 1000
 #define NUM_T_FOR_DC 100
 #define MAX_ITS 10000
 #define EPSILON 0.000001
-
 #define MAX(A,B) ( (A) > (B) ? (A) : (B))
-
-#define PI 3.14159
-
-class Opt
-{
-public:
-	Opt(IloEnv & env);
-	~Opt(){};
-	IloNum Min;
-	IloNumArray ArgMin;
-	IloNumArray Duals;
-	void write(string fname);
-};
 
 // From The Cutting plane algorithm from Stochastic Programming Approaches for Radiation Therapy Planning
 bool cuttingPlaneMethod(IloEnv & env, Opt& solution, Sparse_Matrix<IloInt> & vox,

@@ -94,7 +94,7 @@ void GraphicVoxel::display()
 
    glTranslatef(x, y, z);
 
-   glDrawArrays(GL_QUADS, 0, verts.size()/3);
+   glDrawArrays(GL_QUADS, 0, GLsizei(verts.size()/3));
 
    glPopMatrix();
 

@@ -12,7 +12,7 @@ using std::cout;
 using std::endl;
 
 // how far the axis are set back to make them appear behind the graph
-#define AXIS_DEPTH 0.0001
+#define AXIS_DEPTH 0.0001f
 
 typedef vector<GLfloat> LineStrip;
 
@@ -46,12 +46,12 @@ public:
 
 	   for(unsigned int i=0;i<points;++i)
 	   {
-         verts[verts.size()-1][i*3] = convertX(double(i)*gap+ll);
-         verts[verts.size()-1][i*3+1] = convertY( (helper->*func)(double(i)*gap+ll) );
+         verts[verts.size()-1][i*3] = float(convertX(double(i)*gap+ll));
+         verts[verts.size()-1][i*3+1] = float(convertY( (helper->*func)(double(i)*gap+ll) ));
          verts[verts.size()-1][i*3+2] = 0.f;
       }
 
-      return verts.size()-1;
+      return unsigned(verts.size()-1);
    }
 private:
 

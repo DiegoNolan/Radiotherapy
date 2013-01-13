@@ -248,8 +248,8 @@ void Sparse_Matrix<T>::read(string fname)
 template < class T >
 void Sparse_Matrix<T>::operator= (vector<vector<T> >& mat)
 {
-	m = mat.size();
-	n = mat[0].size();
+	m = unsigned(mat.size());
+	n = unsigned(mat[0].size());
 	a.clear();
 	ia.clear();
 	ja.clear();
@@ -265,7 +265,7 @@ void Sparse_Matrix<T>::operator= (vector<vector<T> >& mat)
 				ja.push_back(j);
 			}
 		}
-		ia.push_back(a.size());
+		ia.push_back(unsigned(a.size()));
 	}
 }
 

@@ -1,34 +1,5 @@
 #include "optimize.h"
 
-
-/*  Opt class stuff */
-Opt::Opt(IloEnv & env) : ArgMin(env), Duals(env)
-{
-
-}
-
-
-void Opt::write(string fname)
-{
-	std::ofstream output(fname.c_str());
-
-	if(!output.is_open()){
-		cout << "Error opening " << fname << endl;
-	}
-
-	for(unsigned int i=0;i<ArgMin.getSize()-1;++i)
-	{
-		output << ArgMin[i] << "\n";
-	}
-
-	output << ArgMin[ArgMin.getSize()-1];
-
-	output.close();
-}
-
-
-/* End Opt class stuff */
-
 bool cuttingPlaneMethod(IloEnv & env, Opt& solution, Sparse_Matrix<IloInt> & vox,
 	Set & X, Set & Y, const IloNum& Ux, const IloNum& Ly, Distribution& u, Distribution& v)
 {
@@ -106,8 +77,8 @@ bool cuttingPlaneMethod(IloEnv & env, Opt& solution, Sparse_Matrix<IloInt> & vox
 
 				/****** Step 2 ******/
 				IloNum dx, dy, Txk, Tyk;
-				dx = deltaX(Txk, 0., X.size(), Dx, u);
-				dy = deltaY(Tyk, 0., Y.size(), Dy, v);
+				dx = deltaX(Txk, 0., unsigned(X.size()), Dx, u);
+				dy = deltaY(Tyk, 0., unsigned(Y.size()), Dy, v);
 
 				cout << " dx dy " << dx << " " << dy << endl;
 

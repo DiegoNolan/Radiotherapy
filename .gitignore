@@ -5,3 +5,4 @@ ipch/
 x64/
 Debug/
 *.sdf
+*.swp

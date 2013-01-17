@@ -1,142 +1,5 @@
 #include "optimize.h"
 
-bool cuttingPlaneMethod(IloEnv & env, Opt& solution, Sparse_Matrix<IloInt> & vox,
-	Set & X, Set & Y, const IloNum& Ux, const IloNum& Ly, Distribution& u, Distribution& v)
-{
-	// booleans for solutions
-	bool solved = false;
-	bool infeasible = false;
-	bool reachedmaxits = false;
-
-	IloInt n, m;
-	m = vox.m;
-	n = vox.n;
-
-	// decision variable
-	try{
-		IloNumVarArray w(env, n, 0, 120);
-
-		/******* Step 0 *********/
-		unsigned int k, kx, ky;
-		k = kx = ky = 1;
-			
-		while(!solved && !reachedmaxits && !infeasible)
-		{
-			/******* Step 1 *********/
-			IloModel model(env);
-			
-
-			// objective function
-			IloExpr obj = minDoses(env, w, vox);
-			
-			// add the objective function
-			model.add( IloMinimize( env, obj) );
-
-			// begin to add constraints
-			IloRangeArray constraints(env);
-
-			// (12)
-			constraints.add( twelveLHS(env, vox, X, Ux, X, w) <= IloNum(X.size())*(u.intToInf(Ux)) );
-			// (13)
-			constraints.add( thirteenLHS(env, vox, Y, Ly, Y, w) <= IloNum(Y.size())*(v.intTo(Ly)) );
-
-			model.add( constraints );
-
-			cout << "solving" << endl;
-			IloCplex cplex(model);
-			cplex.setOut(env.getNullStream());		// silent
-			cplex.setParam(IloCplex::WorkMem, 7000); // add memory
-			//cplex.setParam(IloCplex::MemoryEmphasis, 1); // save memory
-			//cplex.setParam(IloCplex::Threads, 1);  // set thread count
-
-			while(!solved && !infeasible)
-			{
-				cout << "ITERATION " << k << endl;
-		
-				if( !cplex.solve() ){
-					env.error() << "Failed to optimize LP." << endl;
-					throw(-1);
-				}
-
-				// Get solution
-				IloNum min = cplex.getObjValue();
-				IloNumArray vals(env);
-				IloNumArray prev(env);
-				cplex.getValues(vals, w);
-
-				// calculates the doses at the current solution
-				vector<IloNum> Dx, Dy;
-				Dx.resize(X.size()); Dy.resize(Y.size());
-				for(unsigned int i=0;i<Dx.size();++i){
-					Dx[i] = D(X[i], vox, vals);
-				}
-
-				for(unsigned int i=0;i<Dy.size();++i){
-					Dy[i] = D(Y[i], vox, vals);
-				}
-
-				/****** Step 2 ******/
-				IloNum dx, dy, Txk, Tyk;
-				dx = deltaX(Txk, 0., unsigned(X.size()), Dx, u);
-				dy = deltaY(Tyk, 0., unsigned(Y.size()), Dy, v);
-
-				cout << " dx dy " << dx << " " << dy << endl;
-
-				// check to see if solution is optimal
-				if(dx <= EPSILON && dy <= EPSILON){
-							
-					cout << "\n\n\n" << endl;
-					cout << "****************************************" << endl;
-					cout << "A solution was found!" << endl;
-					cout << k << " iterations" << endl;
-					cout << kx << " cuts for the OAR constraint" << endl;
-					cout << ky << " cuts for the PTV constraint" << endl;
-
-					solution.Min = cplex.getObjValue();
-					cplex.getValues( solution.ArgMin, w );
-
-					return true;
-				}
-		
-				/****** Step 3 ******/
-				Set Ak, Bk;
-				if(dx > 0.)
-				{
-					++kx;
-					Ak = getA(Dx, X, Txk);
-					model.add( twelveLHS(env, vox, Ak, Txk, X, w) <= IloNum(X.size())*u.intToInf(Txk) );
-				}
-
-				if(dy > 0.)
-				{
-					++ky;
-					Bk = getB(Dy, Y, Tyk);
-					model.add( thirteenLHS(env, vox, Bk, Tyk, Y, w) <= IloNum(Y.size())*v.intTo(Tyk) );
-				}
-
-				if(k == MAX_ITS){
-					cout << "Reached max iterations " << endl;
-					reachedmaxits = true;
-					break;
-				}
-
-				++k;
-			} // adding cuts
-		}
-	} // try
-	catch(IloException& e){
-		cout << "Concert exception caught: " << e << endl;
-		infeasible = true;
-		return false;
-	}
-	catch(...){
-		cout << "Unknown exception caught" << endl;
-		infeasible = true;
-		return false;
-	}
-	return false;
-}
-
 IloExpr D(unsigned int i, Sparse_Matrix<IloInt>& vox, IloNumVarArray& w, IloEnv & env)
 {
 	IloExpr exp(env);
@@ -226,6 +89,21 @@ Set getB(vector<IloNum> & Dy, Set & Y, IloNum T)
 	}
 
 	return Bk;
+}
+
+vector<IloNum> getDoses(Sparse_Matrix<IloInt>& vox, IloNumArray & w, vector<unsigned> & organSet)
+{
+   vector<IloNum> doses(organSet.size());
+   
+   vector<IloNum>::iterator d_it = doses.begin();
+   for(vector<unsigned>::iterator s_it=organSet.begin();
+      s_it!=organSet.end();++s_it)
+   {
+      *d_it = D(*s_it, vox, w);
+      ++d_it;
+   }
+
+   return doses;
 }
 
 IloExpr minDoses(IloEnv & env, IloNumVarArray & w, Sparse_Matrix<IloInt>& vox)

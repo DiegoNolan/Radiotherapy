@@ -19,10 +19,6 @@ using std::string;
 
 int main()
 {
-   choose(10,3);
-   choose(1,0);
-   choose(33,24);
-
 	// create window
 	sf::RenderWindow Window(sf::VideoMode(1200, 960), "Radiotherapy");
 	
@@ -55,6 +51,11 @@ int main()
 
 		Window.display();
       Window.setActive(false);
+      
+      distOnX.update();
+      distOnY.update();
+      intDistOnX.update();
+      intDistOnY.update();
 
 		if(cur_mode == SOLVE && !solved)
 		{
@@ -67,11 +68,8 @@ int main()
 
 			IloNum Ux, Ly;
 			Ux = 0;	Ly = 90;
-			Distribution u(20, 50);
-			Distribution v(30, 60);
-
-			JumpDist u1(10);
-			JumpDist v1(90);
+			UniformDist u(20, 50);
+			UniformDist v(30, 60);
 
 			Set X /* OAR */, Y /* PTV */;
 			
@@ -94,26 +92,21 @@ int main()
 
          distOnX.addplot(&disthelper, &DistHelper::distOnX);
          distOnX.setColor(0, 255, 0);
-         distOnX.addplot(&u, &Distribution::cdf);
+         distOnX.addplot(&u, &UniformDist::cdf);
          distOnY.addplot(&disthelper, &DistHelper::distOnY);
          distOnY.setColor(0, 255, 0);
-         distOnY.addplot(&v, &Distribution::cdf);
+         distOnY.addplot(&v, &UniformDist::cdf);
          intDistOnX.addplot(&disthelper, &DistHelper::intDistOnX);
          intDistOnX.setColor(0,255,0);
-         intDistOnX.addplot(&u, &Distribution::intToInf);
+         intDistOnX.addplot(&u, &UniformDist::intToInf);
          intDistOnY.addplot(&disthelper, &DistHelper::intDistOnY);
          intDistOnY.setColor(0,255,0);
-         intDistOnY.addplot(&v, &Distribution::intTo);
+         intDistOnY.addplot(&v, &UniformDist::intTo);
          
          env.end();
 
 			solved = true;
 		}
-
-      distOnX.update();
-      distOnY.update();
-      intDistOnX.update();
-      intDistOnY.update();
 	}
 
    std::cin.ignore();

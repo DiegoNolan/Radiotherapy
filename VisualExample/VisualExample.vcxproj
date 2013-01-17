@@ -121,6 +121,7 @@
     <ClCompile Include="visualexample.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\include\benchmark.h" />
     <ClInclude Include="..\include\disthelper.h" />
     <ClInclude Include="..\include\distribution.h" />
     <ClInclude Include="..\include\graph.h" />

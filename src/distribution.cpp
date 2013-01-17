@@ -1,131 +1,5 @@
 #include "distribution.h"
 
-Distribution::Distribution(IloNum l, IloNum u)
-{
-	if(!(u>l)){
-		cout << "Error: upperbound is lower than lower bound\n";
-	}
-
-	b = u;
-	a = l;
-}
-
-IloNum Distribution::cdf(IloNum t)
-{
-	if(t <= a){
-		return 0.;
-	}else if(t < b){
-		return (t-a)/(b-a);
-	}
-
-	return 1.;
-}
-
-IloNum Distribution::intTo(IloNum T)
-{
-	if( T <= a){
-		return 0;
-	}else if(T < b){
-		return .5*((T-a)/(b-a))*(T-a);
-	}
-
-	return .5*(b-a)+(T-b);
-}
-
-IloExpr Distribution::intTo(IloExpr & T, IloNum ti)
-{
-	if(ti <= a){
-		return T*0.; // can't just return 0 unless i pass IloEnv
-	}else if(ti <= b){
-		return (((ti-a)*(ti-a))/(2*(b-a)))+((ti-a)/(b-a))*(T-ti);
-	}
-
-	return .5*(b-a)+T-b;
-}
-
-IloNum Distribution::intToInf(IloNum T)
-{
-	if(T >= b){
-		return 0.;
-	}else if(T > a){
-		return .5*(1-((T-a)/(b-a)))*(b-T);
-	}
-
-	return .5*(b-a)+(a-T);
-}
-
-IloExpr Distribution::intToInf(IloExpr & T, IloNum ti)
-{
-	if(ti <= a){
-		return .5*(b-a)+a-T;
-	}else if(ti <= b){
-		return (((b-ti)*(b-ti))/(2*(b-a)))+((ti-b)/(b-a))*(T-ti);
-	}
-
-	return 0.*T;
-}
-
-vector<IloNum> Distribution::getTRange(unsigned int n)
-{
-	vector<IloNum> range(n);
-
-	IloNum spacing = (b-a)/(IloNum(n)-1.);
-
-	for(unsigned int i=0;i<range.size();++i)
-	{
-		range[i] = a+spacing*IloNum(i);
-	}
-
-	return range;
-}
-
-vector<IloNum> Distribution::getLargerTRange(unsigned int n)
-{
-	vector<IloNum> range(n);
-
-	IloNum low, up;
-	low = a - (b-a);
-	up = b + (b-a);
-
-	IloNum spacing = (up-low)/(IloNum(n)-1.);
-
-	for(unsigned int i=0;i<range.size();++i)
-	{
-		range[i] = low + spacing*IloNum(i);
-	}
-
-	return range;
-}
-
-void Distribution::print(string fname, IloNum lower, IloNum upper, IloInt count)
-{
-	std::ofstream out;
-
-	out.open(fname.c_str());
-
-	if(!out.is_open()){
-		cout << "Error: could not open " << fname << '\n';
-	}
-
-	IloNum spacing = (upper - lower)/(IloNum(count)-1);
-
-	out << "Integral from -infinity to t\n";
-	for(IloNum t = lower;lower<=upper;lower+=spacing)
-	{
-		out << t << '\t' << intTo(t) << '\n';
-	}
-
-	out << "Integral of survival funciton\n";
-
-	for(IloNum t = lower;lower<=upper;lower+=spacing)
-	{
-		out << t << '\t' << intToInf(t) << '\n';
-	}
-
-	out.close();
-
-}
-
 UniformDist::UniformDist(IloNum l, IloNum u)
 {
 	if(!(u>l)){
@@ -134,6 +8,12 @@ UniformDist::UniformDist(IloNum l, IloNum u)
 
 	b = u;
 	a = l;
+}
+
+void UniformDist::operator= (UniformDist & arg)
+{
+   a = arg.a;
+   b = arg.b;
 }
 
 IloNum UniformDist::cdf(IloNum t)
@@ -256,6 +136,11 @@ void UniformDist::print(string fname, IloNum lower, IloNum upper, IloInt count)
 JumpDist::JumpDist(IloNum t)
 {
 	t0 = t;
+}
+
+void JumpDist::operator=(JumpDist & arg)
+{
+   t0 = arg.t0;
 }
 
 IloNum JumpDist::cdf(IloNum t)

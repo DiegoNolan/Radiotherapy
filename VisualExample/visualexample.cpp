@@ -12,6 +12,8 @@ ILOSTLBEGIN
 #include "optimize.h"
 #include "disthelper.h"
 
+#include "benchmark.h"
+
 using std::cout;
 using std::endl;
 using std::string;
@@ -77,8 +79,22 @@ int main()
 			setPTVandOAR(voxels, X, Y);
 
 			Opt solution(env);
+         Opt sol2(env);
 
-			if( !cuttingPlaneMethod(env, solution, vox, X, Y, Ux, Ly, u, v) ){
+         vector<Benchmark<UniformDist> > setAndBenchs(2);
+         setAndBenchs[0] = Benchmark<UniformDist>(UniformDist(-10., -9.),
+            UniformDist(20., 50.), -10., -9., 2, 20., 50, 10);
+         setAndBenchs[0].region = X;
+         setAndBenchs[1] = Benchmark<UniformDist>(UniformDist(30, 60.),
+            UniformDist(100., 101.), 30., 60., 10, 100., 101., 2);
+         setAndBenchs[1].region = Y;
+
+         if( !genCutPlaneMeth(env, solution, vox, setAndBenchs)){
+            cout << "Could not solve" << endl;
+            std::cin.ignore();
+            return EXIT_FAILURE;
+         }
+			if( !cuttingPlaneMethod(env, sol2, vox, X, Y, Ux, Ly, u, v) ){
 				cout << "Couldn't solve\n";
 
 				std::cin.ignore();
@@ -89,13 +105,18 @@ int main()
 			updateDoses(voxels, top, right);
 
          DistHelper disthelper(&vox, &X, &Y, &solution.ArgMin);
+         DistHelper dh2(&vox, &X, &Y, &sol2.ArgMin);
 
          distOnX.addplot(&disthelper, &DistHelper::distOnX);
          distOnX.setColor(0, 255, 0);
          distOnX.addplot(&u, &UniformDist::cdf);
+         distOnX.setColor(0, 0, 255);
+         distOnX.addplot(&dh2, &DistHelper::distOnX);
          distOnY.addplot(&disthelper, &DistHelper::distOnY);
          distOnY.setColor(0, 255, 0);
          distOnY.addplot(&v, &UniformDist::cdf);
+         distOnY.setColor(0, 0, 255);
+         distOnY.addplot(&dh2, &DistHelper::distOnY);
          intDistOnX.addplot(&disthelper, &DistHelper::intDistOnX);
          intDistOnX.setColor(0,255,0);
          intDistOnX.addplot(&u, &UniformDist::intToInf);

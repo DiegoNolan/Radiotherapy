@@ -48,6 +48,29 @@ sf::RenderWindow(sf::VideoMode(window_width, window_height), graphname)
    this->setActive(false);
 }
 
+/*
+void Graph::operator= (const Graph & arg)
+{
+   xRange = arg.xRange;
+   yRange = arg.yRange;
+   xScale = arg.xScale;
+   yScale = arg.yScale;
+   xZero = arg.xZero;
+   yZero = arg.yZero;
+   rr = arg.rr;
+   ll = arg.ll;
+   tt = arg.tt;
+   bb = arg.bb;
+   points = arg.points;
+   verts = arg.verts;
+   xAxis = arg.xAxis;
+   yAxis = arg.yAxis;
+   colors = arg.colors;
+   red = arg.red;
+   green = arg.green;
+   blue = arg.blue;
+} */
+
 Graph::~Graph()
 {
 

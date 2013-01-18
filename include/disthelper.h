@@ -8,23 +8,22 @@ ILOSTLBEGIN
 #include "optimize.h"
 
 
-// helper class
+// helper class for returning distrubitions of the regions
 class DistHelper
 {
 public:
-	DistHelper(Sparse_Matrix<IloInt> *v, Set * x, Set * y, IloNumArray *what);
-	// calculates card{ i \in X : D(i) <= t } / card(X) , F(t)
-	IloNum distOnX( IloNum t);
-	// G(t)
-	IloNum distOnY(IloNum t);
+   DistHelper(){ vox = NULL; Region = NULL; w = NULL;}
+	DistHelper(Sparse_Matrix<IloInt> *v, Set * region, IloNumArray *what);
+   void operator= (DistHelper & arg);
+   // distribution of the region
+	IloNum dist( IloNum t);
 	// Calculates the integral of these dists
-	IloNum intDistOnX(IloNum T);
-	IloNum intDistOnY(IloNum T);
-	void print(string fname, IloNum lower, IloNum upper, IloNum count);
+	IloNum intToInf(IloNum T);
+	IloNum intTo(IloNum T);
+//	void print(string fname, IloNum lower, IloNum upper, IloNum count);
 private:
 	Sparse_Matrix<IloInt> *vox;
-	Set *X;
-	Set *Y;
+	Set *Region;
 	IloNumArray * w;
 };
 

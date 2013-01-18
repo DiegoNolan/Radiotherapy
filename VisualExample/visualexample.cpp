@@ -11,7 +11,7 @@ ILOSTLBEGIN
 #include "graphics.h"
 #include "optimize.h"
 #include "disthelper.h"
-
+#include "graphhelper.h"
 #include "benchmark.h"
 
 using std::cout;
@@ -29,10 +29,7 @@ int main()
 	vector< BeamLet > top = initTop(Window);
 	vector< BeamLet > right = initRight(Window);
    // create graphs
-   Graph distOnX("Dist on X", 900, 600, -1., 100., -.5, 1.5);
-   Graph distOnY("Dist on Y", 900, 600, -1., 100., -.5, 1.5);
-   Graph intDistOnX("Int Dist on X", 900, 600, -1., 100., -2, 40.);
-   Graph intDistOnY("Int Dist on Y", 900, 600, -1., 100., -2, 40.);
+   vector<Graph*> graphs;
 
 	// mode we are in
 	unsigned int cur_mode = SET_TYPE;
@@ -54,10 +51,9 @@ int main()
 		Window.display();
       Window.setActive(false);
       
-      distOnX.update();
-      distOnY.update();
-      intDistOnX.update();
-      intDistOnY.update();
+      for(unsigned i=0;i<graphs.size();++i){
+         graphs[i]->update();
+      }
 
 		if(cur_mode == SOLVE && !solved)
 		{
@@ -81,12 +77,13 @@ int main()
 			Opt solution(env);
          Opt sol2(env);
 
+         // set the benchmarks
          vector<Benchmark<UniformDist> > setAndBenchs(2);
          setAndBenchs[0] = Benchmark<UniformDist>(UniformDist(-10., -9.),
-            UniformDist(20., 50.), -10., -9., 2, 20., 50, 10);
+            UniformDist(20., 50.), -10., -9., 2, 20., 50, 100);
          setAndBenchs[0].region = X;
          setAndBenchs[1] = Benchmark<UniformDist>(UniformDist(30, 60.),
-            UniformDist(100., 101.), 30., 60., 10, 100., 101., 2);
+            UniformDist(40., 70.), 30., 60., 100, 40., 70., 5);
          setAndBenchs[1].region = Y;
 
          if( !genCutPlaneMeth(env, solution, vox, setAndBenchs)){
@@ -103,27 +100,9 @@ int main()
          // Set the doses to the correct amount
 			setDosesFromSolution(solution.ArgMin, top, right);
 			updateDoses(voxels, top, right);
-
-         DistHelper disthelper(&vox, &X, &Y, &solution.ArgMin);
-         DistHelper dh2(&vox, &X, &Y, &sol2.ArgMin);
-
-         distOnX.addplot(&disthelper, &DistHelper::distOnX);
-         distOnX.setColor(0, 255, 0);
-         distOnX.addplot(&u, &UniformDist::cdf);
-         distOnX.setColor(0, 0, 255);
-         distOnX.addplot(&dh2, &DistHelper::distOnX);
-         distOnY.addplot(&disthelper, &DistHelper::distOnY);
-         distOnY.setColor(0, 255, 0);
-         distOnY.addplot(&v, &UniformDist::cdf);
-         distOnY.setColor(0, 0, 255);
-         distOnY.addplot(&dh2, &DistHelper::distOnY);
-         intDistOnX.addplot(&disthelper, &DistHelper::intDistOnX);
-         intDistOnX.setColor(0,255,0);
-         intDistOnX.addplot(&u, &UniformDist::intToInf);
-         intDistOnY.addplot(&disthelper, &DistHelper::intDistOnY);
-         intDistOnY.setColor(0,255,0);
-         intDistOnY.addplot(&v, &UniformDist::intTo);
-         
+   
+         makeGraphs(graphs, vox, solution.ArgMin, setAndBenchs);         
+      
          env.end();
 
 			solved = true;

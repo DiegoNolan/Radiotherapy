@@ -19,8 +19,10 @@ typedef vector<GLfloat> LineStrip;
 class Graph : private sf::RenderWindow
 {
 public:
+   Graph(){}
 	Graph(string graphname, int window_width, int window_height,
       double left, double right, double bottom, double top);
+   // void operator= (const Graph & arg);
 	~Graph();
 	void update();
    // returns the index of the plot

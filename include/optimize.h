@@ -43,11 +43,17 @@ IloExpr thirteenLHS(IloEnv & env, Sparse_Matrix<IloInt>& vox, vector<unsigned in
 template <class Dist>
 IloNum deltaX(IloNum & t, IloNum z, unsigned int cardX,
 	vector<IloNum> & Dxk, Dist & u);
+template <class Dist>
+IloNum deltaX(IloNum & t, IloNum z, unsigned int cardX,
+	vector<IloNum> & Dxk, Dist & u, vector<IloNum> & etas);
 
 // returns the max _{0 <= t <= Ly} ( \max (0, t - D(i)) -card(Y)v(t+s) )
 template <class Dist>
 IloNum deltaY(IloNum & t, IloNum s, unsigned int cardY,
 	vector<IloNum> & Dyk, Dist & v);
+template <class Dist>
+IloNum deltaY(IloNum & t, IloNum s, unsigned int cardY,
+   vector<IloNum> & Dyk, Dist & v, vector<IloNum> & etas);
 
 // A = {i \in X: D^k(i) >= T^{k_x)_X }
 Set getA(vector<IloNum> & Dx, Set & X, IloNum T);
@@ -101,6 +107,31 @@ IloNum deltaX(IloNum & t, IloNum z, unsigned int cardX,
 }
 
 template <class Dist>
+IloNum deltaX(IloNum & t, IloNum z, unsigned int cardX,
+	vector<IloNum> & Dxk, Dist & u, vector<IloNum> & etas)
+{
+	IloNum max = -FLT_MAX;
+	
+	for(unsigned int it=0;it<etas.size();++it)
+	{
+		IloNum val=0;
+		for(unsigned int i=0;i<Dxk.size();++i)
+		{
+			val += MAX( 0.f, Dxk[i] - etas[it]);
+		}
+
+		val -= IloNum(cardX)*u.intToInf(etas[it]-z);
+
+		if(val >= max){
+			max = val;
+			t = etas[it];
+		}
+	}
+
+	return max;
+}
+
+template <class Dist>
 IloNum deltaY(IloNum & t, IloNum s, unsigned int cardY,
 	vector<IloNum> & Dyk, Dist & v)
 {
@@ -121,6 +152,31 @@ IloNum deltaY(IloNum & t, IloNum s, unsigned int cardY,
 		if(val >= max){
 			max = val;
 			t = t_range[it];
+		}
+	}
+
+	return max;
+}
+
+template <class Dist>
+IloNum deltaY(IloNum & t, IloNum s, unsigned int cardY,
+	vector<IloNum> & Dyk, Dist & v, vector<IloNum> & etas)
+{
+	IloNum max = -FLT_MAX;
+	
+	for(unsigned int it=0;it<etas.size();++it)
+	{
+		IloNum val=0;
+		for(unsigned int i=0;i<Dyk.size();++i)
+		{
+			val += MAX( 0.f, etas[it] - Dyk[i]);
+		}
+
+		val -= IloNum(cardY)*v.intTo(etas[it]+s);
+
+		if(val >= max){
+			max = val;
+			t = etas[it];
 		}
 	}
 
@@ -323,10 +379,12 @@ bool genCutPlaneMeth(IloEnv & env, Opt& solution, Sparse_Matrix<IloInt> & vox,
             {
                deltas[i].upper = deltaX(deltas[i].t_upper, 0.,
                   unsigned(setAndBenchMarks[i].region.size()),
-                  doses[i], setAndBenchMarks[i].UpperDist);
+                  doses[i], setAndBenchMarks[i].UpperDist,
+                  setAndBenchMarks[i].upetas);
                deltas[i].lower = deltaY(deltas[i].t_lower, 0.,
                   unsigned(setAndBenchMarks[i].region.size()),
-                  doses[i], setAndBenchMarks[i].LowerDist);
+                  doses[i], setAndBenchMarks[i].LowerDist,
+                  setAndBenchMarks[i].lowetas);
             }
             for(unsigned i=0;i<deltas.size();++i){
                cout << deltas[i].upper << " ";
@@ -344,7 +402,6 @@ bool genCutPlaneMeth(IloEnv & env, Opt& solution, Sparse_Matrix<IloInt> & vox,
             }
 
 				if(max_exceed <= EPSILON){
-							
 					cout << "\n\n\n" << endl;
 					cout << "****************************************" << endl;
 					cout << "A solution was found!" << endl;
@@ -356,6 +413,7 @@ bool genCutPlaneMeth(IloEnv & env, Opt& solution, Sparse_Matrix<IloInt> & vox,
 					return true;
 				}
             
+            // add cuts
             for(unsigned i=0;i<deltas.size();++i)
             {
                if(deltas[i].upper > 0.)
@@ -366,7 +424,6 @@ bool genCutPlaneMeth(IloEnv & env, Opt& solution, Sparse_Matrix<IloInt> & vox,
                      IloNum(setAndBenchMarks[i].region.size())*
                      setAndBenchMarks[i].UpperDist.intToInf(deltas[i].t_upper) ) ;
                }
-               cout << i << " upper" << endl;
 
                if(deltas[i].lower > 0.)
                {
@@ -376,7 +433,6 @@ bool genCutPlaneMeth(IloEnv & env, Opt& solution, Sparse_Matrix<IloInt> & vox,
                      IloNum(setAndBenchMarks[i].region.size())*
                      setAndBenchMarks[i].LowerDist.intTo(deltas[i].t_lower) );
                }
-               cout << i << " lower" << endl;
             }
             cout << "added cuts" << endl;
 				if(k == MAX_ITS){

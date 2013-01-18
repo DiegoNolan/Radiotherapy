@@ -114,6 +114,7 @@
     <ClCompile Include="..\src\disthelper.cpp" />
     <ClCompile Include="..\src\distribution.cpp" />
     <ClCompile Include="..\src\graph.cpp" />
+    <ClCompile Include="..\src\graphhelper.cpp" />
     <ClCompile Include="..\src\graphics.cpp" />
     <ClCompile Include="..\src\opt.cpp" />
     <ClCompile Include="..\src\optimize.cpp" />
@@ -125,6 +126,7 @@
     <ClInclude Include="..\include\disthelper.h" />
     <ClInclude Include="..\include\distribution.h" />
     <ClInclude Include="..\include\graph.h" />
+    <ClInclude Include="..\include\graphhelper.h" />
     <ClInclude Include="..\include\graphics.h" />
     <ClInclude Include="..\include\opt.h" />
     <ClInclude Include="..\include\optimize.h" />

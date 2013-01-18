@@ -1,74 +1,67 @@
 #include "disthelper.h"
 
 
-DistHelper::DistHelper(Sparse_Matrix<IloInt> *v, Set *x, Set* y, IloNumArray *what)
+DistHelper::DistHelper(Sparse_Matrix<IloInt> *v, Set * region, IloNumArray *what)
 {
    vox = v;
-   X = x;
-   Y = y;
+   Region = region;
    w = what;
 }
 
-IloNum DistHelper::distOnX( IloNum t)
+void DistHelper::operator= (DistHelper & arg)
+{
+   vox = arg.vox;
+   Region = arg.Region;
+   w = arg.w;
+}
+
+IloNum DistHelper::dist( IloNum t)
 {
   unsigned int sum=0;
-  for(unsigned int i=0;i<X->size();++i)
+  for(unsigned int i=0;i<Region->size();++i)
   {
-     if(D((*X)[i], *vox, *w) <= t){
+     if(D((*Region)[i], *vox, *w) <= t){
         ++sum;
      }
   }
 
-  return IloNum(sum)/IloNum(X->size());
+  return IloNum(sum)/IloNum(Region->size());
 }
 
-IloNum DistHelper::distOnY(IloNum t)
-{
-  unsigned int sum=0;
-  for(unsigned int i=0;i<Y->size();++i)
-  {
-     if(D((*Y)[i], *vox, *w) <= t){
-        ++sum;
-     }
-  }
-
-  return IloNum(sum)/IloNum(Y->size());
-}
-
-IloNum DistHelper::intDistOnX(IloNum T)
+IloNum DistHelper::intToInf(IloNum T)
 {
   IloNum sum=0.;
-  for(unsigned int i=0;i<X->size();++i)
+  for(unsigned int i=0;i<Region->size();++i)
   {
-     if( D((*X)[i], *vox, *w) - T > 0){
-        sum += D((*X)[i], *vox, *w) - T;
+     if( D((*Region)[i], *vox, *w) - T > 0){
+        sum += D((*Region)[i], *vox, *w) - T;
      }
   }
 
 
-  return sum/IloNum(X->size());
+  return sum/IloNum(Region->size());
 }
 
-IloNum DistHelper::intDistOnY(IloNum T)
+IloNum DistHelper::intTo(IloNum T)
 {
   IloNum sum=0.;
-  for(unsigned int i=0;i<Y->size();++i)
+  for(unsigned int i=0;i<Region->size();++i)
   {
-     if( T - D((*Y)[i], *vox, *w)> 0){
-        sum += T - D((*Y)[i], *vox, *w);
+     if( T - D((*Region)[i], *vox, *w)> 0){
+        sum += T - D((*Region)[i], *vox, *w);
      }
   }
 
 
-  return sum/IloNum(Y->size());
+  return sum/IloNum(Region->size());
 }
-
+/*
 void DistHelper::print(string fname, IloNum lower, IloNum upper, IloNum count)
 {
   std::ofstream out;
 
   out.open(fname.c_str());
-  out.width(20);
+  out.width(20);k
 
   if(!out.is_open()){
      cout << "Error: could not open " << fname << '\n';
@@ -91,4 +84,4 @@ void DistHelper::print(string fname, IloNum lower, IloNum upper, IloNum count)
   }
 
   out.close();
-}
+} */

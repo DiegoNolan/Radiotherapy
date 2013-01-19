@@ -21,6 +21,8 @@ public:
    Benchmark(){}
    Benchmark(T & lowdist, T & updist, IloNum lowlow, IloNum highlow, unsigned low_n,
       IloNum lowup, IloNum highup, unsigned up_n);
+   Benchmark(T & lowdist, T & updist, IloNum lowlow, IloNum highlow, unsigned low_n,
+      IloNum lowup, IloNum highup, unsigned up_n, Set & reg);
    void operator=(Benchmark<T> & arg);
    ~Benchmark(){}
    T LowerDist, UpperDist;
@@ -41,6 +43,19 @@ Benchmark<T>::Benchmark(T & lowdist, T & updist, IloNum lowlow,
 }
 
 template <class T>
+Benchmark<T>::Benchmark(T & lowdist, T & updist, IloNum lowlow, IloNum highlow, unsigned low_n,
+   IloNum lowup, IloNum highup, unsigned up_n, Set & reg)
+{
+   UpperDist = updist;
+   LowerDist = lowdist;
+
+   upetas = getRange(lowup, highup, up_n);
+   lowetas = getRange(lowlow, highlow, low_n);
+
+   region = reg;
+}
+
+template <class T>
 void Benchmark<T>::operator=(Benchmark<T> & arg)
 {
    LowerDist = arg.LowerDist;
@@ -49,6 +64,8 @@ void Benchmark<T>::operator=(Benchmark<T> & arg)
    lowetas = arg.lowetas;
    region = arg.region;
 }
+
+
 
 template <class T>
 vector<T> getRange( T low, T high, unsigned n)

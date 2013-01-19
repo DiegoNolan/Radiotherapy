@@ -3,6 +3,7 @@ ILOSTLBEGIN
 
 #include <iostream>
 #include <string>
+#include <map>
 
 #include "distribution.h"
 #include "graph.h"
@@ -17,6 +18,7 @@ ILOSTLBEGIN
 using std::cout;
 using std::endl;
 using std::string;
+using std::map;
 
 
 int main()
@@ -44,10 +46,8 @@ int main()
 		
       Window.setActive(true);
 		Window.clear();
-
 		// display the visual example
 		display(Window, voxels, right, top);
-
 		Window.display();
       Window.setActive(false);
       
@@ -78,13 +78,11 @@ int main()
          Opt sol2(env);
 
          // set the benchmarks
-         vector<Benchmark<UniformDist> > setAndBenchs(2);
-         setAndBenchs[0] = Benchmark<UniformDist>(UniformDist(-10., -9.),
-            UniformDist(20., 50.), -10., -9., 2, 20., 50, 100);
-         setAndBenchs[0].region = X;
-         setAndBenchs[1] = Benchmark<UniformDist>(UniformDist(30, 60.),
-            UniformDist(40., 70.), 30., 60., 100, 40., 70., 5);
-         setAndBenchs[1].region = Y;
+         map< string, Benchmark<UniformDist> > setAndBenchs;
+         setAndBenchs["OAR"] = Benchmark<UniformDist>(UniformDist(-10., -9.),
+            UniformDist(20., 50.), -10., -9., 2, 20., 50, 100, X);
+         setAndBenchs["PTV"] = Benchmark<UniformDist>(UniformDist(30, 60.),
+            UniformDist(40., 70.), 30., 60., 100, 40., 70., 5, Y);
 
          if( !genCutPlaneMeth(env, solution, vox, setAndBenchs)){
             cout << "Could not solve" << endl;
@@ -108,6 +106,11 @@ int main()
 			solved = true;
 		}
 	}
+
+   // deallocate graphs
+   for(unsigned i=0;i<graphs.size();++i){
+      delete graphs[i];
+   }
 
    std::cin.ignore();
    return 0;

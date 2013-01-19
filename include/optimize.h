@@ -4,15 +4,17 @@
 #include <ilcplex/ilocplex.h>
 ILOSTLBEGIN
 
-#include <unordered_set>
+#include <map>
+#include <string>
 
 #include "sparse_matrix.h"
 #include "distribution.h"
 #include "set.h"
 #include "opt.h"
 #include "benchmark.h"
-
-using std::unordered_set;
+ 
+using std::map;
+using std::string;
 
 #define NUM_T_VALS 10
 #define NUM_T_FOR_DC 100
@@ -72,7 +74,7 @@ bool cuttingPlaneMethod(IloEnv & env, Opt& solution, Sparse_Matrix<IloInt> & vox
 
 template <class dist>
 bool genCutPlaneMeth(IloEnv & env, Opt& solution, Sparse_Matrix<IloInt> & vox,
-   vector<Benchmark<dist> > & setAndBenchMarks);
+   map< string, Benchmark<dist> > & setAndBenchMarks);
 
 
 /******** Objective Functions *****************/
@@ -304,7 +306,7 @@ bool cuttingPlaneMethod(IloEnv & env, Opt& solution, Sparse_Matrix<IloInt> & vox
 
 template <class dist>
 bool genCutPlaneMeth(IloEnv & env, Opt& solution, Sparse_Matrix<IloInt> & vox,
-   vector<Benchmark<dist> > & setAndBenchMarks)
+   map< string, Benchmark<dist> > & setAndBenchMarks)
 {
 	// booleans for solutions
 	bool solved = false;
@@ -330,13 +332,13 @@ bool genCutPlaneMeth(IloEnv & env, Opt& solution, Sparse_Matrix<IloInt> & vox,
 			// add the objective function
 			model.add( IloMinimize( env, obj) );
 			// begin to add constraints
-         for(vector<Benchmark<dist>>::iterator it=setAndBenchMarks.begin();
+         for(map<string, Benchmark<dist>>::iterator it=setAndBenchMarks.begin();
             it!=setAndBenchMarks.end();++it)
          {
-            model.add( twelveLHS(env, vox, it->region, *(it->upetas.begin()), it->region, w) <=
-               IloNum(it->region.size())*(it->UpperDist.intToInf(*it->upetas.begin())) );
-            model.add( thirteenLHS(env, vox, it->region, *(it->lowetas.rbegin()), it->region, w) <=
-               IloNum(it->region.size())*(it->LowerDist.intTo(*it->lowetas.rbegin())) );
+            model.add( twelveLHS(env, vox, it->second.region, *(it->second.upetas.begin()), it->second.region, w) <=
+               IloNum(it->second.region.size())*(it->second.UpperDist.intToInf(*it->second.upetas.begin())) );
+            model.add( thirteenLHS(env, vox, it->second.region, *(it->second.lowetas.rbegin()), it->second.region, w) <=
+               IloNum(it->second.region.size())*(it->second.LowerDist.intTo(*it->second.lowetas.rbegin())) );
          }
 
 			IloCplex cplex(model);
@@ -365,26 +367,28 @@ bool genCutPlaneMeth(IloEnv & env, Opt& solution, Sparse_Matrix<IloInt> & vox,
 
 				// calculates the doses at the current solution
             vector< vector<IloNum> > doses(setAndBenchMarks.size());
-            vector<Benchmark<dist>>::iterator bench_it=setAndBenchMarks.begin();
+            map< string, Benchmark<dist>>::iterator bench_it=setAndBenchMarks.begin();
             for(vector< vector<IloNum> >::iterator v_it=doses.begin();
                v_it!=doses.end();++v_it)
             {
-               *v_it = getDoses(vox, vals, bench_it->region);
+               *v_it = getDoses(vox, vals, bench_it->second.region);
                ++bench_it;
             }
 
 				/****** Step 2 ******/
             vector< Delta > deltas(doses.size());
+            bench_it = setAndBenchMarks.begin();
             for(unsigned i=0;i<deltas.size();++i)
             {
                deltas[i].upper = deltaX(deltas[i].t_upper, 0.,
-                  unsigned(setAndBenchMarks[i].region.size()),
-                  doses[i], setAndBenchMarks[i].UpperDist,
-                  setAndBenchMarks[i].upetas);
+                  unsigned(bench_it->second.region.size()),
+                  doses[i], bench_it->second.UpperDist,
+                  bench_it->second.upetas);
                deltas[i].lower = deltaY(deltas[i].t_lower, 0.,
-                  unsigned(setAndBenchMarks[i].region.size()),
-                  doses[i], setAndBenchMarks[i].LowerDist,
-                  setAndBenchMarks[i].lowetas);
+                  unsigned(bench_it->second.region.size()),
+                  doses[i], bench_it->second.LowerDist,
+                  bench_it->second.lowetas);
+               ++bench_it;
             }
             for(unsigned i=0;i<deltas.size();++i){
                cout << deltas[i].upper << " ";
@@ -414,25 +418,27 @@ bool genCutPlaneMeth(IloEnv & env, Opt& solution, Sparse_Matrix<IloInt> & vox,
 				}
             
             // add cuts
+            bench_it = setAndBenchMarks.begin();
             for(unsigned i=0;i<deltas.size();++i)
             {
                if(deltas[i].upper > 0.)
                {
                   model.add( twelveLHS(env, vox,
-                     getA(doses[i], setAndBenchMarks[i].region, deltas[i].t_upper),
-                     deltas[i].t_upper, setAndBenchMarks[i].region, w) <=
-                     IloNum(setAndBenchMarks[i].region.size())*
-                     setAndBenchMarks[i].UpperDist.intToInf(deltas[i].t_upper) ) ;
+                     getA(doses[i], bench_it->second.region, deltas[i].t_upper),
+                     deltas[i].t_upper, bench_it->second.region, w) <=
+                     IloNum(bench_it->second.region.size())*
+                     bench_it->second.UpperDist.intToInf(deltas[i].t_upper) ) ;
                }
 
                if(deltas[i].lower > 0.)
                {
                   model.add( thirteenLHS(env, vox,
-                     getB(doses[i], setAndBenchMarks[i].region, deltas[i].t_lower),
-                     deltas[i].t_lower, setAndBenchMarks[i].region, w)  <=
-                     IloNum(setAndBenchMarks[i].region.size())*
-                     setAndBenchMarks[i].LowerDist.intTo(deltas[i].t_lower) );
+                     getB(doses[i], bench_it->second.region, deltas[i].t_lower),
+                     deltas[i].t_lower, bench_it->second.region, w)  <=
+                     IloNum(bench_it->second.region.size())*
+                     bench_it->second.LowerDist.intTo(deltas[i].t_lower) );
                }
+               ++bench_it;
             }
             cout << "added cuts" << endl;
 				if(k == MAX_ITS){

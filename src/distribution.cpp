@@ -3,7 +3,7 @@
 UniformDist::UniformDist(IloNum l, IloNum u)
 {
 	if(!(u>l)){
-		cout << "Error: upperbound is lower than lower bound\n";
+		cout << "Error: upperbound is lower than lower bound " << l << " " << u << endl;
 	}
 
 	b = u;
@@ -131,6 +131,7 @@ void UniformDist::print(string fname, IloNum lower, IloNum upper, IloInt count)
 	out.close();
 
 }
+
 
 // Jumpdist
 JumpDist::JumpDist(IloNum t)

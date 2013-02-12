@@ -16,9 +16,7 @@ ILOSTLBEGIN
 using std::map;
 using std::string;
 
-#define NUM_T_VALS 10
-#define NUM_T_FOR_DC 100
-#define MAX_ITS 10000
+#define MAX_ITS 900
 #define EPSILON 0.000001
 #define MAX(A,B) ( (A) > (B) ? (A) : (B))
 
@@ -75,6 +73,10 @@ bool cuttingPlaneMethod(IloEnv & env, Opt& solution, Sparse_Matrix<IloInt> & vox
 template <class dist>
 bool genCutPlaneMeth(IloEnv & env, Opt& solution, Sparse_Matrix<IloInt> & vox,
    map< string, Benchmark<dist> > & setAndBenchMarks);
+
+template <class dist>
+bool MIPMethod(IloEnv & env, Opt& solution, Sparse_Matrix<IloInt> & vox,
+   map< string, Benchmark<dist> >& setAndBenchmarks);
 
 
 /******** Objective Functions *****************/
@@ -314,6 +316,7 @@ bool genCutPlaneMeth(IloEnv & env, Opt& solution, Sparse_Matrix<IloInt> & vox,
 	IloInt n, m;
 	m = vox.m;
 	n = vox.n;
+   unsigned constraint_count=0;
 
 	// decision variable
 	try{
@@ -328,29 +331,35 @@ bool genCutPlaneMeth(IloEnv & env, Opt& solution, Sparse_Matrix<IloInt> & vox,
 			/******* Step 1 *********/
 			IloModel model(env);
 			// objective function
-			IloExpr obj = minDoses(env, w, vox);
+			IloExpr obj = minBeamletStr(env, w, vox);
 			// add the objective function
 			model.add( IloMinimize( env, obj) );
 			// begin to add constraints
          for(map<string, Benchmark<dist>>::iterator it=setAndBenchMarks.begin();
             it!=setAndBenchMarks.end();++it)
          {
-            model.add( twelveLHS(env, vox, it->second.region, *(it->second.upetas.begin()), it->second.region, w) <=
-               IloNum(it->second.region.size())*(it->second.UpperDist.intToInf(*it->second.upetas.begin())) );
-            model.add( thirteenLHS(env, vox, it->second.region, *(it->second.lowetas.rbegin()), it->second.region, w) <=
-               IloNum(it->second.region.size())*(it->second.LowerDist.intTo(*it->second.lowetas.rbegin())) );
+            if(it->second.upetas.size() != 0){
+               model.add( twelveLHS(env, vox, it->second.region, *(it->second.upetas.begin()), it->second.region, w) <=
+                  IloNum(it->second.region.size())*(it->second.UpperDist.intToInf(*it->second.upetas.begin())) );
+               ++constraint_count;
+            }
+            if(it->second.lowetas.size() != 0){
+               model.add( thirteenLHS(env, vox, it->second.region, *(it->second.lowetas.rbegin()), it->second.region, w) <=
+                  IloNum(it->second.region.size())*(it->second.LowerDist.intTo(*it->second.lowetas.rbegin())) );
+               ++constraint_count;
+            }
          }
 
-			IloCplex cplex(model);
-			cplex.setOut(env.getNullStream());		// silent
+         IloCplex cplex(model);
+         cplex.setOut(env.getNullStream());		// silent
 			cplex.setParam(IloCplex::WorkMem, 7000); // add memory
 			//cplex.setParam(IloCplex::MemoryEmphasis, 1); // save memory
 			//cplex.setParam(IloCplex::Threads, 1);  // set thread count
-
-			cout << "solving" << endl;
+		
 			while(!solved)
 			{
 				cout << "ITERATION " << k << endl;
+            cout << constraint_count << " constraints " << endl;
 		
 				if( !cplex.solve() ){
 					env.error() << "Failed to optimize LP." << endl;
@@ -390,6 +399,7 @@ bool genCutPlaneMeth(IloEnv & env, Opt& solution, Sparse_Matrix<IloInt> & vox,
                   bench_it->second.lowetas);
                ++bench_it;
             }
+            cout << "Actual Constraint values" << endl;
             for(unsigned i=0;i<deltas.size();++i){
                cout << deltas[i].upper << " ";
             } cout << endl;
@@ -428,6 +438,7 @@ bool genCutPlaneMeth(IloEnv & env, Opt& solution, Sparse_Matrix<IloInt> & vox,
                      deltas[i].t_upper, bench_it->second.region, w) <=
                      IloNum(bench_it->second.region.size())*
                      bench_it->second.UpperDist.intToInf(deltas[i].t_upper) ) ;
+                  ++constraint_count;
                }
 
                if(deltas[i].lower > 0.)
@@ -437,13 +448,16 @@ bool genCutPlaneMeth(IloEnv & env, Opt& solution, Sparse_Matrix<IloInt> & vox,
                      deltas[i].t_lower, bench_it->second.region, w)  <=
                      IloNum(bench_it->second.region.size())*
                      bench_it->second.LowerDist.intTo(deltas[i].t_lower) );
+                  ++constraint_count;
                }
                ++bench_it;
             }
-            cout << "added cuts" << endl;
 				if(k == MAX_ITS){
 					cout << "Reached max iterations " << endl;
-					break;
+					solution.Min = min;
+					solution.ArgMin = vals;
+               cplex.exportModel("save.lp");
+               return true;
 				}
 
 				++k;
@@ -458,6 +472,75 @@ bool genCutPlaneMeth(IloEnv & env, Opt& solution, Sparse_Matrix<IloInt> & vox,
 		cout << "Unknown exception caught" << endl;
 		return false;
 	}
+	return false; // never should reach here
+}
+
+template <class dist>
+bool MIPMethod(IloEnv & env, Opt& solution, Sparse_Matrix<IloInt> & vox,
+   map< string, Benchmark<dist> >& setAndBenchmarks)
+
+{
+   try
+   {
+      IloModel model(env);
+
+      IloNumVarArray w(env, vox.n, 0., DBL_MAX);
+      model.add( IloMinimize(env, IloSum(w) ) );
+
+      // add constraints
+      for(map<string, Benchmark<dist> >::iterator b_it=setAndBenchmarks.begin();
+         b_it!=setAndBenchmarks.end();++b_it)
+      {
+         for(unsigned i=0;i<b_it->second.lowetas.size();++i)
+         {
+            IloExpr expr(env);
+            for(unsigned j=0;j<b_it->second.region.size();++j){
+               expr += IloMax(0., b_it->second.lowetas[i] - D(b_it->second.region[j], vox, w, env));
+            }
+            expr -= IloNum(b_it->second.region.size())*b_it->second.LowerDist.intTo(
+               b_it->second.lowetas[i]);
+            model.add( expr <= 1.);
+         }
+
+         for(unsigned i=0;i<b_it->second.upetas.size();++i)
+         {
+            IloExpr expr(env);
+            for(unsigned j=0;j<b_it->second.region.size();++j)
+            {
+               expr += IloMax(0., D(b_it->second.region[j], vox, w, env) - b_it->second.upetas[i]);
+            }
+            expr -= IloNum(b_it->second.region.size())*b_it->second.UpperDist.intToInf(
+               b_it->second.upetas[i]);
+            model.add( expr <= 1.);
+         }
+      }
+
+      IloCplex cplex(model);
+
+      if( !cplex.solve() )
+      {
+         if( !cplex.isPrimalFeasible() ){
+            cout << "Problem is not feasible" << endl;
+         }
+         env.error() << "unable to solve" << endl;
+         throw(-1);
+      }
+
+      solution.Min = cplex.getObjValue();
+      cplex.getValues(w, solution.ArgMin );
+
+      return true;
+
+   }
+   catch(IloException& e){
+		cout << "Concert exception caught: " << e << endl;
+		return false;
+	}
+	catch(...){
+		cout << "Unknown exception caught" << endl;
+		return false;
+	}
+
 	return false; // never should reach here
 }
 

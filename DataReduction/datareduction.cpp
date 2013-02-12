@@ -19,6 +19,7 @@ ILOSTLBEGIN
 #include "graphicvoxel.h"
 #include "visualizer.h"
 #include "graphicorgan.h"
+#include "graphicbeamlet.h"
 
 using std::vector;
 using std::string;

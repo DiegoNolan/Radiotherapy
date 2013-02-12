@@ -7,10 +7,14 @@ ILOSTLBEGIN
 #include <iostream>
 #include <string>
 #include <fstream>
+#include <cmath>
+#include <boost/math/special_functions.hpp>
 
 using std::cout;
 using std::vector;
 using std::string;
+
+#define PI 3.14159265359
 
 class UniformDist
 {
@@ -47,6 +51,7 @@ public:
 private:
    IloNum a, b;
 };
+
 
 class JumpDist
 {

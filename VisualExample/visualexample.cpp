@@ -84,17 +84,17 @@ int main()
          setAndBenchs["PTV"] = Benchmark<UniformDist>(UniformDist(30, 60.),
             UniformDist(40., 70.), 30., 60., 100, 40., 70., 5, Y);
 
-         if( !genCutPlaneMeth(env, solution, vox, setAndBenchs)){
+         if( !MIPMethod(env, solution, vox, setAndBenchs)){
             cout << "Could not solve" << endl;
             std::cin.ignore();
             return EXIT_FAILURE;
          }
-			if( !cuttingPlaneMethod(env, sol2, vox, X, Y, Ux, Ly, u, v) ){
+			/*if( !cuttingPlaneMethod(env, sol2, vox, X, Y, Ux, Ly, u, v) ){
 				cout << "Couldn't solve\n";
 
 				std::cin.ignore();
 				return EXIT_FAILURE;
-			}
+			}*/
          // Set the doses to the correct amount
 			setDosesFromSolution(solution.ArgMin, top, right);
 			updateDoses(voxels, top, right);

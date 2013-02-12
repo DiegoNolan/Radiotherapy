@@ -5,6 +5,10 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DataReduction", "DataReduct
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "VisualExample", "VisualExample\VisualExample.vcxproj", "{AC818041-FC6D-4D78-808D-AB114E2E55C2}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FullScale", "FullScale\FullScale.vcxproj", "{32CE9224-AA42-457F-9843-0B897F473EE5}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Sandbox", "Sandbox\Sandbox.vcxproj", "{11887817-2967-40C5-8E4E-B52ADC740916}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -19,6 +23,14 @@ Global
 		{AC818041-FC6D-4D78-808D-AB114E2E55C2}.Debug|Win32.Build.0 = Debug|x64
 		{AC818041-FC6D-4D78-808D-AB114E2E55C2}.Release|Win32.ActiveCfg = Release|Win32
 		{AC818041-FC6D-4D78-808D-AB114E2E55C2}.Release|Win32.Build.0 = Release|Win32
+		{32CE9224-AA42-457F-9843-0B897F473EE5}.Debug|Win32.ActiveCfg = Debug|x64
+		{32CE9224-AA42-457F-9843-0B897F473EE5}.Debug|Win32.Build.0 = Debug|x64
+		{32CE9224-AA42-457F-9843-0B897F473EE5}.Release|Win32.ActiveCfg = Release|Win32
+		{32CE9224-AA42-457F-9843-0B897F473EE5}.Release|Win32.Build.0 = Release|Win32
+		{11887817-2967-40C5-8E4E-B52ADC740916}.Debug|Win32.ActiveCfg = Debug|x64
+		{11887817-2967-40C5-8E4E-B52ADC740916}.Debug|Win32.Build.0 = Debug|x64
+		{11887817-2967-40C5-8E4E-B52ADC740916}.Release|Win32.ActiveCfg = Release|Win32
+		{11887817-2967-40C5-8E4E-B52ADC740916}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

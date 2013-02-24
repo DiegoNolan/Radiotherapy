@@ -16,8 +16,8 @@ ILOSTLBEGIN
 using std::map;
 using std::string;
 
-#define MAX_ITS 900
-#define EPSILON 0.000001
+#define MAX_ITS 10000
+#define EPSILON 1.
 #define MAX(A,B) ( (A) > (B) ? (A) : (B))
 
 // used for exceeding of the benchmarks
@@ -30,13 +30,21 @@ typedef struct
 // returns the expression for the dose
 IloExpr D(unsigned int i, Sparse_Matrix<IloInt>& vox, IloNumVarArray& w, IloEnv & env);
 IloNum D(unsigned int i, Sparse_Matrix<IloInt>& vox, IloNumArray& w_hat);
+// do by reference
+void DRef( unsigned i, Sparse_Matrix<IloInt>& vox, IloNumVarArray& w, IloExpr & expr);
 
 // returns \sum _{i \in A} (D(i)-Tx) 
 IloExpr twelveLHS(IloEnv & env, Sparse_Matrix<IloInt>& vox, vector<unsigned int> & A,
 	IloNum Tx, vector<unsigned int> & X, IloNumVarArray & w);
+// reference
+void twelveLHSRef(IloEnv & env, IloExpr & expr, Sparse_Matrix<IloInt>& vox, vector<unsigned int> & A,
+	IloNum Tx, vector<unsigned int> & X, IloNumVarArray & w);
 
 // returns \sum _{i \in B}(Ty-D(i)
 IloExpr thirteenLHS(IloEnv & env, Sparse_Matrix<IloInt>& vox, vector<unsigned int> & B,
+	IloNum Ty, vector<unsigned int> & Y, IloNumVarArray & w);
+// refernce
+void thirteenLHSRef(IloEnv & env, IloExpr & expr, Sparse_Matrix<IloInt>& vox, vector<unsigned int> & B,
 	IloNum Ty, vector<unsigned int> & Y, IloNumVarArray & w);
 
 // returns the max _{t >= U} ( \max (0, D(i) - t) - card(X)*u(t-z) )
@@ -331,7 +339,7 @@ bool genCutPlaneMeth(IloEnv & env, Opt& solution, Sparse_Matrix<IloInt> & vox,
 			/******* Step 1 *********/
 			IloModel model(env);
 			// objective function
-			IloExpr obj = minBeamletStr(env, w, vox);
+			IloExpr obj = IloSum(w);
 			// add the objective function
 			model.add( IloMinimize( env, obj) );
 			// begin to add constraints
@@ -353,13 +361,23 @@ bool genCutPlaneMeth(IloEnv & env, Opt& solution, Sparse_Matrix<IloInt> & vox,
          IloCplex cplex(model);
          cplex.setOut(env.getNullStream());		// silent
 			cplex.setParam(IloCplex::WorkMem, 7000); // add memory
+         cplex.setParam(IloCplex::RootAlg, IloCplex::Dual);
 			//cplex.setParam(IloCplex::MemoryEmphasis, 1); // save memory
 			//cplex.setParam(IloCplex::Threads, 1);  // set thread count
-		
+
+         // initilze for stuff inside the loop      
+			IloNumArray vals(env);
+         vector< vector<IloNum> > doses(setAndBenchMarks.size());
+         vector< Delta > deltas(doses.size());
+         map< string, Benchmark<dist>>::iterator bench_it;
 			while(!solved)
 			{
-				cout << "ITERATION " << k << endl;
-            cout << constraint_count << " constraints " << endl;
+            if(k%100 == 0 || k == 1){
+				   cout << "ITERATION " << k << endl;
+               cout << cplex.getNrows() << " constraints " << endl;
+               cout << "Memory usage " << env.getMemoryUsage()/(1024*1024) << endl;
+               cout << "Extractables " << env.getMaxId() << endl;
+            }
 		
 				if( !cplex.solve() ){
 					env.error() << "Failed to optimize LP." << endl;
@@ -370,13 +388,11 @@ bool genCutPlaneMeth(IloEnv & env, Opt& solution, Sparse_Matrix<IloInt> & vox,
 				}
 
 				// Get solution
-				IloNum min = cplex.getObjValue();
-				IloNumArray vals(env);
 				cplex.getValues(vals, w);
-
-				// calculates the doses at the current solution
-            vector< vector<IloNum> > doses(setAndBenchMarks.size());
-            map< string, Benchmark<dist>>::iterator bench_it=setAndBenchMarks.begin();
+            IloNum min = cplex.getObjValue();
+				
+            // calculates the doses at the current solution
+            bench_it=setAndBenchMarks.begin();
             for(vector< vector<IloNum> >::iterator v_it=doses.begin();
                v_it!=doses.end();++v_it)
             {
@@ -384,8 +400,7 @@ bool genCutPlaneMeth(IloEnv & env, Opt& solution, Sparse_Matrix<IloInt> & vox,
                ++bench_it;
             }
 
-				/****** Step 2 ******/
-            vector< Delta > deltas(doses.size());
+				/****** Step 2 ******/         
             bench_it = setAndBenchMarks.begin();
             for(unsigned i=0;i<deltas.size();++i)
             {
@@ -399,13 +414,15 @@ bool genCutPlaneMeth(IloEnv & env, Opt& solution, Sparse_Matrix<IloInt> & vox,
                   bench_it->second.lowetas);
                ++bench_it;
             }
-            cout << "Actual Constraint values" << endl;
-            for(unsigned i=0;i<deltas.size();++i){
-               cout << deltas[i].upper << " ";
-            } cout << endl;
-            for(unsigned i=0;i<deltas.size();++i){
-               cout << deltas[i].lower << " ";
-            } cout << endl;
+            if(k%100 == 0){
+               cout << "Actual Constraint values" << endl;
+               for(unsigned i=0;i<deltas.size();++i){
+                  cout << deltas[i].upper << " ";
+               } cout << endl;
+               for(unsigned i=0;i<deltas.size();++i){
+                  cout << deltas[i].lower << " ";
+               } cout << endl;
+            }
 
 				// check to see if solution is optimal
             IloNum max_exceed=-100.;
@@ -433,21 +450,27 @@ bool genCutPlaneMeth(IloEnv & env, Opt& solution, Sparse_Matrix<IloInt> & vox,
             {
                if(deltas[i].upper > 0.)
                {
-                  model.add( twelveLHS(env, vox,
+                  IloExpr temp_expr(env);
+                  twelveLHSRef(env, temp_expr, vox,
                      getA(doses[i], bench_it->second.region, deltas[i].t_upper),
-                     deltas[i].t_upper, bench_it->second.region, w) <=
+                     deltas[i].t_upper, bench_it->second.region, w);
+                  model.add( temp_expr <=
                      IloNum(bench_it->second.region.size())*
                      bench_it->second.UpperDist.intToInf(deltas[i].t_upper) ) ;
+                  temp_expr.end();
                   ++constraint_count;
                }
 
                if(deltas[i].lower > 0.)
                {
-                  model.add( thirteenLHS(env, vox,
+                  IloExpr temp_expr(env);
+                  thirteenLHSRef(env, temp_expr, vox,
                      getB(doses[i], bench_it->second.region, deltas[i].t_lower),
-                     deltas[i].t_lower, bench_it->second.region, w)  <=
+                     deltas[i].t_lower, bench_it->second.region, w);
+                  model.add( temp_expr  <=
                      IloNum(bench_it->second.region.size())*
                      bench_it->second.LowerDist.intTo(deltas[i].t_lower) );
+                  temp_expr.end();
                   ++constraint_count;
                }
                ++bench_it;
@@ -457,6 +480,7 @@ bool genCutPlaneMeth(IloEnv & env, Opt& solution, Sparse_Matrix<IloInt> & vox,
 					solution.Min = min;
 					solution.ArgMin = vals;
                cplex.exportModel("save.lp");
+               cout << "Objective min is " << min << endl;
                return true;
 				}
 

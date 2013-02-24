@@ -36,6 +36,14 @@ IloNum D(unsigned int i, Sparse_Matrix<IloInt>& vox, IloNumArray& w_hat)
 	return num;
 }
 
+void DRef( unsigned i, Sparse_Matrix<IloInt>& vox, IloNumVarArray& w, IloExpr & expr)
+{
+   for(unsigned int j=vox.ia[i];j<vox.ia[i+1];++j)
+	{
+		expr += vox.a[j]*w[vox.ja[j]];
+	}
+}
+
 
 IloExpr twelveLHS(IloEnv & env, Sparse_Matrix<IloInt>& vox, vector<unsigned int> & A,
 	IloNum Tx, vector<unsigned int> & X, IloNumVarArray& w)
@@ -50,6 +58,18 @@ IloExpr twelveLHS(IloEnv & env, Sparse_Matrix<IloInt>& vox, vector<unsigned int>
 	return expr;
 }
 
+void twelveLHSRef(IloEnv & env, IloExpr & expr, Sparse_Matrix<IloInt>& vox, vector<unsigned int> & A,
+	IloNum Tx, vector<unsigned int> & X, IloNumVarArray & w)
+{
+   for(unsigned int i=0;i<A.size();++i)
+	{
+      IloExpr temp_expr(env);
+      DRef(A[i], vox, w, temp_expr);
+		expr += temp_expr - Tx;
+      temp_expr.end();
+	}
+}
+
 IloExpr thirteenLHS(IloEnv & env, Sparse_Matrix<IloInt>& vox, vector<unsigned int> & B,
 	IloNum Ty, vector<unsigned int> & Y, IloNumVarArray & w)
 {
@@ -61,6 +81,18 @@ IloExpr thirteenLHS(IloEnv & env, Sparse_Matrix<IloInt>& vox, vector<unsigned in
 	}
 
 	return expr;
+}
+
+void thirteenLHSRef(IloEnv & env, IloExpr & expr, Sparse_Matrix<IloInt>& vox, vector<unsigned int> & B,
+	IloNum Ty, vector<unsigned int> & Y, IloNumVarArray & w)
+{
+   for(unsigned int i=0;i<B.size();++i)
+	{
+      IloExpr temp_expr(env);
+      DRef(B[i], vox, w, temp_expr);
+		expr += Ty - temp_expr;
+      temp_expr.end();
+	}
 }
 
 

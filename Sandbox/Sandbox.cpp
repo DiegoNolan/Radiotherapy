@@ -3,6 +3,7 @@ ILOSTLBEGIN
 
 #include <iostream>
 #include <cmath>
+#include <fstream>
 
 #include "sparse_matrix.h"
 #include "set.h"
@@ -11,6 +12,7 @@ ILOSTLBEGIN
 #include "optimize.h"
 #include "graph.h"
 #include "graphhelper.h"
+#include "patientdvh.h"
 #include <string>
 #include <map>
 
@@ -21,28 +23,16 @@ using std::endl;
 
 int main()
 {
-   IloEnv env;
-   try
+   PatientDVH pdata("../data/DVH _Tabular Format");
+
+   for(unsigned i=0;i<pdata.structures.size();++i)
    {
-      IloModel model(env);
-
-      IloCplex cplex(env);
+      if(pdata.structures[i].getName() == "BRAINSTEM")
+      {
+         pdata.structures[i-1].print();
+      }
    }
-	catch(IloException& e){
-		cout << "Concert exception caught: " << e << endl;
-      cin.ignore();
-		return false;
-	}
-   catch(...)
-   {
-      env.error() << "error " << endl;
-      cin.ignore();
-      return -1;
-   }
-
-   std::cin.ignore();
-   env.end();
-
+  
    std::cin.ignore();
    return 0;
 }

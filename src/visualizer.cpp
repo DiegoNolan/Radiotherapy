@@ -42,6 +42,8 @@ void initLights()
 
 void handleEvents(sf::Window & window)
 {
+   quaternion<GLfloat> test(1.f, 1.f, 1.f, 1.f);
+
    sf::Event event;
    while(window.pollEvent(event))
    {
@@ -50,7 +52,7 @@ void handleEvents(sf::Window & window)
       }
 
       if(event.type == sf::Event::MouseWheelMoved){
-         glTranslatef(0.f, 0.f, float(event.mouseWheel.delta));
+         glTranslatef(0.f, 0.f, 5.f*float(event.mouseWheel.delta));
       }
 
       if(event.type == sf::Event::KeyPressed){
@@ -73,4 +75,36 @@ void handleEvents(sf::Window & window)
          }
       }
    }
+}
+
+void GLQuaternion::normalise()
+{
+   GLfloat mag2 = a*a + b*b + c*c + d*d;
+   if(abs(float(mag2)) > QUAT_NORM_TOL && abs(float(mag2)-1.f) > QUAT_NORM_TOL)
+   {
+      float mag = sqrt(float(mag2));
+      a /= mag;
+      b /= mag;
+      c /= mag;
+      d /= mag;
+   }
+}
+
+GLQuaternion GLQuaternion::conjugate()
+{
+   return GLQuaternion(a, -b, -c, -d);
+}
+
+sf::Vector3<GLfloat> GLQuaternion::operator* (sf::Vector3<GLfloat> vec)
+{
+   GLfloat mag = sqrt(vec.x*vec.x + vec.y*vec.y + vec.z*vec.z);
+   vec.x /= mag;
+   vec.y /= mag;
+   vec.z /= mag;
+
+   GLQuaternion vecQuat(0.f, vec.x, vec.y, vec.z);
+
+  // GLQuaternion resQuat = vecQuat*conjugate();
+
+   return sf::Vector3<GLfloat>();
 }

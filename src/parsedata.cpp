@@ -40,9 +40,15 @@ void parseOrganData(Sparse_Matrix<IloInt> & vox, vector<std::set<unsigned> > & o
 
 		printf("%d bytes read into memory\n", fileSize ); // done reading file into memory
 
+      // get the voxel mapping
+      if(it==0){
+         voxelmap = getVoxelMapping(buffer, result);
+      }
+
 		// get number of voxels
 		unsigned int voxelCount = numVoxels(buffer, result);
 		cout << "Number of voxels " << voxelCount << endl;
+      
 
 		// get beamlet counts
 		vector<vec2> beamletCounts = getBeamletCounts(buffer, result);
@@ -55,14 +61,8 @@ void parseOrganData(Sparse_Matrix<IloInt> & vox, vector<std::set<unsigned> > & o
 		// get the set of the organ
 		std::set<unsigned> organSet = getOrganSet(buffer, result);
 		cout << "Size of organ is " << organSet.size() << " voxels" << endl;
-
-      // get the voxel mapping
-      if(it==0){
-         voxelmap = getVoxelMapping(buffer, result);
-         cout << endl;
-         voxelmap.print();
-         cout << endl;
-      }
+      cout << "Volume of region " << organSet.size()*voxelmap.height()*voxelmap.width()*voxelmap.depth()/(10*10*10) << " cm^3" << endl;
+      
 
 		free(buffer);
 

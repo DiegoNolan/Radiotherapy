@@ -1,7 +1,6 @@
 #pragma once
 
 #include <ilcplex/ilocplex.h>
-
 ILOSTLBEGIN
 
 #include <SFML/Graphics.hpp>

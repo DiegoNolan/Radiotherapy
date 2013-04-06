@@ -4,6 +4,7 @@ ILOSTLBEGIN
 #include <iostream>
 #include <string>
 #include <map>
+#include "omp.h"
 
 #include "distribution.h"
 #include "graph.h"
@@ -64,15 +65,19 @@ int main()
 			Sparse_Matrix<IloInt> vox;
 			vox = getVoxMat(voxels, top, right, m, n);
 
-			IloNum Ux, Ly;
-			Ux = 0;	Ly = 90;
-			UniformDist u(20, 50);
-			UniformDist v(30, 60);
+			//IloNum Ux, Ly;
+			//Ux = 0;	Ly = 90;
+			//UniformDist u(20, 50);
+			//UniformDist v(30, 60);
 
 			Set X /* OAR */, Y /* PTV */;
 			
 			// Denote where the PTV and OAR are
 			setPTVandOAR(voxels, X, Y);
+
+         writeSet(X, "../data/X.set");
+         writeSet(Y, "../data/Y.set");
+         vox.write("../data/vis.vox");
 
 			Opt solution(env);
          Opt sol2(env);
@@ -84,18 +89,25 @@ int main()
          setAndBenchs["PTV"] = Benchmark<UniformDist>(UniformDist(30, 60.),
             UniformDist(40., 70.), 30., 60., 100, 40., 70., 5, Y);
 
+         double start = omp_get_wtime();
          if( !MIPMethod(env, solution, vox, setAndBenchs)){
             cout << "Could not solve" << endl;
             std::cin.ignore();
             return EXIT_FAILURE;
          }
-			/*if( !cuttingPlaneMethod(env, sol2, vox, X, Y, Ux, Ly, u, v) ){
+         double end = omp_get_wtime();
+         cout << "Method ran in " << (end-start)/60. << " minutes " << endl;
+         
+         start = omp_get_wtime();
+         if( !genCutPlaneMeth(env, solution, vox, setAndBenchs)){
 				cout << "Couldn't solve\n";
 
 				std::cin.ignore();
 				return EXIT_FAILURE;
-			}*/
-         // Set the doses to the correct amount
+			}
+         end = omp_get_wtime();
+         cout << "Method ran in " << (end-start)/60. << " minutes " << endl;
+
 			setDosesFromSolution(solution.ArgMin, top, right);
 			updateDoses(voxels, top, right);
    

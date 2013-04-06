@@ -1,7 +1,5 @@
 #include "graph.h"
 
-
-
 Graph::Graph(string graphname, int window_width, int window_height,
    double left, double right, double bottom, double top) :
 sf::RenderWindow(sf::VideoMode(window_width, window_height), graphname)
@@ -121,7 +119,8 @@ void Graph::update()
    // draw graphs
    for(unsigned int i=0;i<verts.size();++i)
    {  
-      glColor3fv( &colors[i][0] );
+      //glColor3fv( &colors[i][0] );
+      glColor3f(colors[i][0], colors[i][1], colors[i][2]);
 
       glEnableClientState(GL_VERTEX_ARRAY);
       glVertexPointer(3, GL_FLOAT, 0, &verts[i][0]);

@@ -123,6 +123,10 @@ public:
 		cout << endl;
 		
 	}
+   unsigned getNumNonZeros(unsigned row)
+   {
+      return ia[row+1]-ia[row];
+   }
 
 	vector<T> a;				// non zero elements
 	vector<unsigned int> ia;	// index of a for all elements in i row

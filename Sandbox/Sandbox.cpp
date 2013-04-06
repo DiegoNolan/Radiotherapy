@@ -24,13 +24,12 @@ using std::endl;
 int main()
 {
    PatientDVH pdata("../data/DVH _Tabular Format");
+   
+   pdata.genGraph();
 
-   for(unsigned i=0;i<pdata.structures.size();++i)
+   while(1)
    {
-      if(pdata.structures[i].getName() == "BRAINSTEM")
-      {
-         pdata.structures[i-1].print();
-      }
+      pdata.displayGraph();
    }
   
    std::cin.ignore();

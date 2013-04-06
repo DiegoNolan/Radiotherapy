@@ -59,9 +59,9 @@ unsigned int Graph::addplot(A * helper, double (A::*func)(double t))
 
   colors.resize(colors.size()+1);
   colors[colors.size()-1].resize(3);
-  colors[colors.size()-1][0] = red;
-  colors[colors.size()-1][1] = green;
-  colors[colors.size()-1][2] = blue;
+  colors[colors.size()-1][0] = float(red)/255.f;
+  colors[colors.size()-1][1] = float(green)/255.f;
+  colors[colors.size()-1][2] = float(blue)/255.f;
 
 
   double gap = (rr-ll)/double(points-1);

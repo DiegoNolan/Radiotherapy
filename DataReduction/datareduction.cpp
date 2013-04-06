@@ -28,6 +28,14 @@ using std::endl;
 
 int main()
 {
+   quaternion<GLfloat> u1(.5,.5,.5,.5);
+   quaternion<GLfloat> u2(.5,-.5,-.5,-.5);
+   quaternion<GLfloat> r(0.,1.,1.,1.);
+
+   quaternion<GLfloat> rot = u1*r*u2;
+
+   cout << rot << endl;
+
    vector<string> fnames;
    string vox_name = "run1";
    // enter file names

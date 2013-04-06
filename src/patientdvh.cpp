@@ -2,11 +2,13 @@
 
 PatientDVH::PatientDVH()
 {
-
+   graphptr = NULL;
 }
 
 PatientDVH::PatientDVH(string filename)
 {
+   graphptr = NULL;
+
    string f_contents = getFileContentsAsString(filename);
 
    // get the patient name
@@ -32,7 +34,7 @@ PatientDVH::PatientDVH(string filename)
          
          temp_trp.relDose = getNextNumber(f_contents, pos);
          temp_trp.dose = getNextNumber(f_contents, pos);
-         temp_trp.ratioTotStruct = getNextNumber(f_contents, pos);
+         temp_trp.ratioTotStruct = getNextNumber(f_contents, pos)/100.;
 
          data.push_back(temp_trp);
       }
@@ -45,9 +47,27 @@ PatientDVH::PatientDVH(string filename)
 
 PatientDVH::~PatientDVH()
 {
-
+   delete graphptr;
 }
 
+void PatientDVH::genGraph()
+{
+   graphptr = new Graph(patientName, 1200, 900, -1.f, 110.f, -.1f, 1.1f);
+
+   for(unsigned i=0;i<structures.size();++i)
+   {
+      graphptr->setColor( color_array[i][0], color_array[i][1], color_array[i][2] );
+      graphptr->addplot(&structures[i], &Histogram::getValFromRel );
+   }
+}
+
+void PatientDVH::displayGraph()
+{
+   if(graphptr != NULL)
+   {
+      graphptr->update();
+   }
+}
 
 // private members
 void PatientDVH::getPatientName(string & f_contents)

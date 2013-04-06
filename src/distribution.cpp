@@ -132,6 +132,87 @@ void UniformDist::print(string fname, IloNum lower, IloNum upper, IloInt count)
 
 }
 
+// PiecewiseLinDist
+PiecewiseLinDist::PiecewiseLinDist()
+{
+
+}
+
+PiecewiseLinDist::~PiecewiseLinDist()
+{
+
+}
+
+void PiecewiseLinDist::operator= (const PiecewiseLinDist & arg)
+{
+   data = arg.data;
+}
+
+IloNum PiecewiseLinDist::cdf(IloNum t)
+{
+   if( t <= data[0].t){
+      return data[0].t;
+   }else if(t >= data[data.size()-1].t){
+      return data[data.size()-1].t;
+   }
+
+   for(unsigned i=1;i<data.size();++i)
+   {
+      if(data[i].t > t)
+      {
+         IloNum slope = (data[i].cdf_t - data[i-1].cdf_t)/
+            (data[i].t - data[i-1].t);
+         return slope*(t-data[i-1].t) + data[i-1].cdf_t;
+      }
+   }
+
+   // should never reach here
+   return 0.;
+}
+
+IloNum PiecewiseLinDist::intTo(IloNum T)
+{
+   if( T <= data[0].t){
+      return 0.;
+   }
+
+   IloNum sum = 0.;
+   for(unsigned i=1;i<data.size();++i)
+   {
+      if(data[i].t > T)
+      {
+         for(unsigned j=1;j=i;++j)
+         {
+            sum += (data[j-1].cdf_t+data[j].cdf_t)*(data[j].t-data[j-1].t)/2.;
+         }
+
+         sum += (cdf(T)+data[i].cdf_t)*(T-data[i].t)/2.;
+         return sum;
+      }
+   }
+
+   for(unsigned i=1;i<data.size();++i)
+   {
+      sum += (data[i-1].cdf_t+data[i].cdf_t)*(data[i].t-data[i-1].t)/2.;
+   }
+
+   return sum;
+}
+
+IloExpr intTo(IloExpr & T, IloNum ti)
+{
+   return IloExpr();
+}
+
+IloNum intToInf(IloNum T)
+{
+   return 0.;
+}
+
+IloExpr intToInf(IloExpr & T, IloNum ti)
+{
+   return IloExpr();
+}
 
 // Jumpdist
 JumpDist::JumpDist(IloNum t)

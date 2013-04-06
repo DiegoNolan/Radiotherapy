@@ -16,6 +16,8 @@ using std::string;
 
 #define PI 3.14159265359
 
+
+// TODO : have to not return expressions becuase it leaks memory
 class UniformDist
 {
 public:
@@ -50,6 +52,33 @@ public:
 	void shift(IloNum shift_val){a += shift_val; b += shift_val;}
 private:
    IloNum a, b;
+};
+
+typedef struct
+{
+   IloNum t;
+   IloNum cdf_t;
+} PWLD_pair;
+
+
+class PiecewiseLinDist
+{
+public:
+   ~PiecewiseLinDist();
+   void operator= (const PiecewiseLinDist & arg);
+   // returns the cdf of the distribution
+	IloNum cdf(IloNum t);
+	// returns the integral of the cdf from negative infinity to the argument
+	IloNum intTo(IloNum T);
+	// returns linear approximation at point ti to point T
+	IloExpr intTo(IloExpr & T, IloNum ti);
+	// returns the integral of the survival function from the argument to infinity
+	IloNum intToInf(IloNum T);
+	// returns linear approximation at point ti to point T
+	IloExpr intToInf(IloExpr & T, IloNum ti);
+private:
+   PiecewiseLinDist();
+   vector<PWLD_pair> data;
 };
 
 

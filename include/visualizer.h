@@ -15,20 +15,14 @@ void initLights();
 void handleEvents(sf::Window & window);
 
 
-// a is rotation, b is x, c is y, d is z
-class GLQuaternion : public quaternion<GLfloat>
+class Quat : public quaternion<GLfloat>
 {
 public:
-   GLQuaternion(GLfloat a, GLfloat b, GLfloat c, GLfloat d) :
-      quaternion<GLfloat>(a, b, c, d)
-   {}
-   ~GLQuaternion(){}
+   Quat(GLfloat a, GLfloat b, GLfloat c, GLfloat d);
+   ~Quat(){}
 
-   void normalise();
-   GLQuaternion conjugate();
-
-   sf::Vector3<GLfloat> operator* (sf::Vector3<GLfloat> vec);
-
+   void normalize();
+   Quat conjugate();
 private:
 
 };

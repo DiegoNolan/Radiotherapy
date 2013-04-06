@@ -6,9 +6,30 @@
 
 #include "fileio.h"
 #include "histogram.h"
+#include "graph.h"
 
 using std::cout;
 using std::endl;
+
+const int color_array[][3] =
+{
+   { 250, 0, 0 },
+   { 200, 50, 0 },
+   { 150, 100, 0 },
+   { 100, 150, 0 },
+   { 50, 200, 0 },
+   { 0, 250, 0 },
+   { 0, 200, 50 },
+   { 0, 150, 100 },
+   { 0, 100, 150 },
+   { 0, 50, 200 },
+   { 0, 0, 250 },
+   { 50, 0, 200 },
+   { 100, 0, 150 },
+   { 150, 0, 100 },
+   { 200, 0, 50 },
+   { 250, 0, 0 }
+};
 
 class PatientDVH
 {
@@ -18,6 +39,8 @@ public:
    PatientDVH(string filename);
    ~PatientDVH();
    vector<Histogram> structures;
+   void genGraph();
+   void displayGraph();
 private:
    void getPatientName(string & f_contents);
    string getStructureName(string & f_contents, size_t & pos);
@@ -28,6 +51,7 @@ private:
    // assumes all positve numbers
    double getNextNumber(string & f_contents, size_t & pos);
    string patientName;
+   Graph * graphptr;
 };
 
 #endif // PATIENTDVH_H

@@ -28,6 +28,8 @@ public:
    void operator= (const Histogram & hist);
    string getName(){return structName;}
    void print();
+   // returns a linearally interpolated value
+   double getValFromRel(double rel_dose);
 private:
    string structName;
    vector<Histogram_Triplet> data;

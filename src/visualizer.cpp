@@ -77,34 +77,23 @@ void handleEvents(sf::Window & window)
    }
 }
 
-void GLQuaternion::normalise()
+Quat::Quat(GLfloat a, GLfloat b, GLfloat c, GLfloat d) :
+quaternion(a, b, c, d)
 {
-   GLfloat mag2 = a*a + b*b + c*c + d*d;
-   if(abs(float(mag2)) > QUAT_NORM_TOL && abs(float(mag2)-1.f) > QUAT_NORM_TOL)
-   {
-      float mag = sqrt(float(mag2));
-      a /= mag;
-      b /= mag;
-      c /= mag;
-      d /= mag;
-   }
+
 }
 
-GLQuaternion GLQuaternion::conjugate()
+void Quat::normalize()
 {
-   return GLQuaternion(a, -b, -c, -d);
+   GLfloat mag = sqrt(R_component_1()*R_component_1() + R_component_2()*R_component_2() +
+      R_component_3()*R_component_3() + R_component_4()*R_component_4());
+
+   *this /= mag;
 }
 
-sf::Vector3<GLfloat> GLQuaternion::operator* (sf::Vector3<GLfloat> vec)
+
+Quat Quat::conjugate()
 {
-   GLfloat mag = sqrt(vec.x*vec.x + vec.y*vec.y + vec.z*vec.z);
-   vec.x /= mag;
-   vec.y /= mag;
-   vec.z /= mag;
-
-   GLQuaternion vecQuat(0.f, vec.x, vec.y, vec.z);
-
-  // GLQuaternion resQuat = vecQuat*conjugate();
-
-   return sf::Vector3<GLfloat>();
+   return Quat(R_component_1(), -R_component_2(), -R_component_3(), -R_component_4());
 }
+

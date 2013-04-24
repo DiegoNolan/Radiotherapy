@@ -11,27 +11,27 @@ using std::endl;
 int main()
 {
    vector<string> fnames;
-   string vox_name = "vis";
+   string vox_name = "run1";
    Sparse_Matrix<IloInt> vox;
    vox.read("../data/" + vox_name + ".vox");
 
    // create benchmarks and sets
    map<string, Benchmark<UniformDist> > setAndBenches;
    setAndBenches["Spinalcord+0.5"] = Benchmark<UniformDist>(
-      UniformDist(-10., -9.), UniformDist(30., 100.), -10., -9.,
-      0, 30., 100., 5);
-   //setAndBenches["L PAROTID"] = Benchmark<UniformDist>(
-   //   UniformDist(-10., -9.), UniformDist(60., 70.), -10., -9.,
-   //   0, 60., 70., 10);
-   //setAndBenches["pituitary"] = Benchmark<UniformDist>(
-   //   UniformDist(-10., -9.), UniformDist(33., 40.), -10., -9.,
-   //   0, 33., 40., 10);
+      UniformDist(-10., -9.), UniformDist(30., 120.), -10., -9.,
+      0, 30., 120., 10);
+   setAndBenches["L PAROTID"] = Benchmark<UniformDist>(
+      UniformDist(-10., -9.), UniformDist(30., 120.), -10., -9.,
+      0, 30., 120., 10);
+   setAndBenches["pituitary"] = Benchmark<UniformDist>(
+      UniformDist(-10., -9.), UniformDist(30., 120), -10., -9.,
+      0, 30., 120., 10);
    setAndBenches["PTV 1"] = Benchmark<UniformDist>(
-      UniformDist(30., 100.), UniformDist(100., 150.), 30., 100.,
-      5, 100., 150., 5);
-   //setAndBenches["R PAROTID"] = Benchmark<UniformDist>(
-   //   UniformDist(-10., -9.), UniformDist(50., 60.), -10., -9.,
-   //   0, 50., 60., 10);
+      UniformDist(10., 100.), UniformDist(100., 200.), 10., 100.,
+      10, 100., 200., 0);
+   setAndBenches["R PAROTID"] = Benchmark<UniformDist>(
+      UniformDist(-10., -9.), UniformDist(30., 120.), -10., -9.,
+      0, 30., 120., 10);
 
    for(std::map<string, Benchmark<UniformDist> >::iterator it=
       setAndBenches.begin();it!=setAndBenches.end();++it)
@@ -40,7 +40,7 @@ int main()
       cout << it->second.region.size() << endl;
    }
 
-   unsigned one, two, three, four, five;
+  /* unsigned one, two, three, four, five;
    one = two = three = four = five = 0;
    unsigned min = 100000;
    unsigned max = 0;
@@ -87,16 +87,20 @@ int main()
    cout << "Min: " << min << " Max: " << max << " Mean: " << mean << endl;
    cout << "1: " << one << " 2: " << two << " 3: " << three << " 4: " << four << " 5: " << five << endl;
    
-   std::cin.ignore();
+   std::cin.ignore();*/
    
    IloEnv env;
    Opt solution(env);
 
-   if( !MIPMethod(env, solution, vox, setAndBenches) ){
+   if( !genCutPlaneMeth(env, solution, vox, setAndBenches) ){
       cout << "Could not solve" << endl;
       std::cin.ignore();
       return EXIT_FAILURE;
    }
+
+   solution.write("../data/CP_500");
+
+   cout << endl << "Method ran in " << solution.RunTimeSeconds << " seconds" << endl;
 
    vector<Graph*> graphs;
 
@@ -110,7 +114,6 @@ int main()
          graphs[i]->update();
       }
    }
-   
    
    // deallocate graphs
    for(unsigned i=0;i<graphs.size();++i){

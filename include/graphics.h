@@ -9,17 +9,12 @@ ILOSTLBEGIN
 
 using std::vector;
 
-#define ROWS 30
-#define COLS 30
-#define SIZE 25
-
-
 enum mode
 {
 	SET_TYPE = 0,
 	SHOW_DOSES,
 	SOLVE,
-	SHOW_TYPE
+	SHOW_TYPE,
 };
 
 enum vox_type
@@ -50,9 +45,9 @@ public:
 	{
 		strength = str;
 		if(!vert){
-			this->setSize(sf::Vector2f(float(SIZE)*.75f, float(strength)));
+			this->setSize(sf::Vector2f(float(10)*.75f, float(strength)));
 		}else{
-			this->setSize(sf::Vector2f(float(strength), float(SIZE)*.75f));
+			this->setSize(sf::Vector2f(float(strength), float(10)*.75f));
 		}
 	}
 	unsigned int strength;
@@ -62,11 +57,14 @@ public:
 
 void updateDoses(vector< vector< Voxel > > & voxels, vector< BeamLet> & top, vector< BeamLet > & right);
 
-vector< vector< Voxel > > initVoxels(sf::RenderWindow & window);
+vector< vector< Voxel > > initVoxels(sf::RenderWindow & window,
+   unsigned rows=30, unsigned cols=30, unsigned vox_size=25);
 
-vector< BeamLet > initTop(sf::RenderWindow & window );
+vector< BeamLet > initTop(sf::RenderWindow & window, unsigned rows=30, unsigned cols=30,
+   unsigned vox_size=25);
 
-vector< BeamLet > initRight(sf::RenderWindow & window);
+vector< BeamLet > initRight(sf::RenderWindow & window, unsigned rows=30, unsigned cols=30,
+   unsigned vox_size=25);
 
 void handleEvents(sf::RenderWindow & Window, unsigned int & cur_mode, bool & solved,
 	vector<vector<Voxel> >& voxels, vector< BeamLet >& top, vector< BeamLet>& right);
@@ -78,5 +76,7 @@ vector< vector<IloInt> > getVoxMat(vector< vector< Voxel> >& voxels,
 	vector<BeamLet>& top, vector<BeamLet>& right, IloInt& m, IloInt& n);
 
 void setPTVandOAR(vector<vector<Voxel> >& voxels, Set & X, Set & Y);
+
+void createPTVandOAR(vector<vector<Voxel> > & voxels, Set & X, Set & Y);
 
 void setDosesFromSolution(IloNumArray& vals, vector<BeamLet>& top, vector<BeamLet>& right);

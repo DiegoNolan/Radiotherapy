@@ -15,6 +15,7 @@ public:
 	IloNum Min;
 	IloNumArray ArgMin;
 	IloNumArray Duals;
+   double RunTimeSeconds;
 	void write(string fname);
 };
 

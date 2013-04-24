@@ -9,6 +9,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FullScale", "FullScale\Full
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Sandbox", "Sandbox\Sandbox.vcxproj", "{11887817-2967-40C5-8E4E-B52ADC740916}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "VisualBenchmark", "VisualBenchmark\VisualBenchmark.vcxproj", "{44545D01-8845-48B3-AC0B-8359EF8EE1E6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -31,6 +33,10 @@ Global
 		{11887817-2967-40C5-8E4E-B52ADC740916}.Debug|Win32.Build.0 = Debug|x64
 		{11887817-2967-40C5-8E4E-B52ADC740916}.Release|Win32.ActiveCfg = Release|Win32
 		{11887817-2967-40C5-8E4E-B52ADC740916}.Release|Win32.Build.0 = Release|Win32
+		{44545D01-8845-48B3-AC0B-8359EF8EE1E6}.Debug|Win32.ActiveCfg = Debug|x64
+		{44545D01-8845-48B3-AC0B-8359EF8EE1E6}.Debug|Win32.Build.0 = Debug|x64
+		{44545D01-8845-48B3-AC0B-8359EF8EE1E6}.Release|Win32.ActiveCfg = Release|Win32
+		{44545D01-8845-48B3-AC0B-8359EF8EE1E6}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

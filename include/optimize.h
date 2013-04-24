@@ -6,6 +6,7 @@ ILOSTLBEGIN
 
 #include <map>
 #include <string>
+#include <omp.h>
 
 #include "sparse_matrix.h"
 #include "distribution.h"
@@ -16,8 +17,8 @@ ILOSTLBEGIN
 using std::map;
 using std::string;
 
-#define MAX_ITS 10000
-#define EPSILON 1.
+#define MAX_ITS 100000
+#define EPSILON 10
 #define MAX(A,B) ( (A) > (B) ? (A) : (B))
 
 // used for exceeding of the benchmarks
@@ -318,6 +319,8 @@ template <class dist>
 bool genCutPlaneMeth(IloEnv & env, Opt& solution, Sparse_Matrix<IloInt> & vox,
    map< string, Benchmark<dist> > & setAndBenchMarks)
 {
+   double start, end;
+   start = omp_get_wtime();
 	// booleans for solutions
 	bool solved = false;
 
@@ -404,6 +407,7 @@ bool genCutPlaneMeth(IloEnv & env, Opt& solution, Sparse_Matrix<IloInt> & vox,
             bench_it = setAndBenchMarks.begin();
             for(unsigned i=0;i<deltas.size();++i)
             {
+               // calculate deltas for constraints
                deltas[i].upper = deltaX(deltas[i].t_upper, 0.,
                   unsigned(bench_it->second.region.size()),
                   doses[i], bench_it->second.UpperDist,
@@ -440,6 +444,8 @@ bool genCutPlaneMeth(IloEnv & env, Opt& solution, Sparse_Matrix<IloInt> & vox,
 
 					solution.Min = cplex.getObjValue();
 					cplex.getValues( solution.ArgMin, w );
+               end = omp_get_wtime();
+               solution.RunTimeSeconds = end - start;
 
 					return true;
 				}
@@ -475,13 +481,14 @@ bool genCutPlaneMeth(IloEnv & env, Opt& solution, Sparse_Matrix<IloInt> & vox,
                }
                ++bench_it;
             }
+            
 				if(k == MAX_ITS){
 					cout << "Reached max iterations " << endl;
 					solution.Min = min;
 					solution.ArgMin = vals;
                cplex.exportModel("save.lp");
                cout << "Objective min is " << min << endl;
-               return true;
+               return false;
 				}
 
 				++k;
@@ -502,8 +509,9 @@ bool genCutPlaneMeth(IloEnv & env, Opt& solution, Sparse_Matrix<IloInt> & vox,
 template <class dist>
 bool MIPMethod(IloEnv & env, Opt& solution, Sparse_Matrix<IloInt> & vox,
    map< string, Benchmark<dist> >& setAndBenchmarks)
-
 {
+   double start, end;
+   start = omp_get_wtime();
    try
    {
       IloModel model(env);
@@ -523,7 +531,7 @@ bool MIPMethod(IloEnv & env, Opt& solution, Sparse_Matrix<IloInt> & vox,
             }
             expr -= IloNum(b_it->second.region.size())*b_it->second.LowerDist.intTo(
                b_it->second.lowetas[i]);
-            model.add( expr <= 1.);
+            model.add( expr <= EPSILON);
          }
 
          for(unsigned i=0;i<b_it->second.upetas.size();++i)
@@ -535,7 +543,7 @@ bool MIPMethod(IloEnv & env, Opt& solution, Sparse_Matrix<IloInt> & vox,
             }
             expr -= IloNum(b_it->second.region.size())*b_it->second.UpperDist.intToInf(
                b_it->second.upetas[i]);
-            model.add( expr <= 1.);
+            model.add( expr <= EPSILON);
          }
       }
 
@@ -552,6 +560,9 @@ bool MIPMethod(IloEnv & env, Opt& solution, Sparse_Matrix<IloInt> & vox,
 
       solution.Min = cplex.getObjValue();
       cplex.getValues(w, solution.ArgMin );
+      end = omp_get_wtime();
+       
+      solution.RunTimeSeconds = end - start;
 
       return true;
 

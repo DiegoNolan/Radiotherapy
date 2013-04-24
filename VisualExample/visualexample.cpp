@@ -21,7 +21,6 @@ using std::endl;
 using std::string;
 using std::map;
 
-
 int main()
 {
 	// create window
@@ -96,16 +95,6 @@ int main()
             return EXIT_FAILURE;
          }
          double end = omp_get_wtime();
-         cout << "Method ran in " << (end-start)/60. << " minutes " << endl;
-         
-         start = omp_get_wtime();
-         if( !genCutPlaneMeth(env, solution, vox, setAndBenchs)){
-				cout << "Couldn't solve\n";
-
-				std::cin.ignore();
-				return EXIT_FAILURE;
-			}
-         end = omp_get_wtime();
          cout << "Method ran in " << (end-start)/60. << " minutes " << endl;
 
 			setDosesFromSolution(solution.ArgMin, top, right);
